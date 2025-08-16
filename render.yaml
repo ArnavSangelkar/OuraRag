@@ -2,8 +2,11 @@ services:
   - type: web
     name: oura-rag-app
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: streamlit run streamlit_app.py --server.port $PORT --server.address 0.0.0.0
+    plan: starter  # Free tier, upgrade as needed
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: streamlit run streamlit_app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
     envVars:
       - key: SUPABASE_URL
         sync: false
@@ -15,6 +18,20 @@ services:
         sync: false
       - key: OURA_PERSONAL_ACCESS_TOKEN
         sync: false
+      - key: STREAMLIT_SERVER_HEADLESS
+        value: true
+      - key: STREAMLIT_SERVER_ENABLE_CORS
+        value: false
+      - key: STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION
+        value: false
     healthCheckPath: /
     autoDeploy: true
+    numInstances: 1
+    region: oregon  # Choose your preferred region
+    buildFilter:
+      paths:
+        - app/**
+        - streamlit_app.py
+        - requirements.txt
+        - render.yaml
 

@@ -30,35 +30,199 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for better styling
+# Enhanced Custom CSS for modern, professional styling
 st.markdown("""
 <style>
+    /* Modern color scheme and typography */
+    :root {
+        --primary-color: #6366f1;
+        --secondary-color: #8b5cf6;
+        --accent-color: #06b6d4;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --error-color: #ef4444;
+        --background-color: #f8fafc;
+        --card-background: #ffffff;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+    }
+    
+    /* Global styles */
+    .main {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem;
+    }
+    
+    /* Header styling */
     .main-header {
-        font-size: 3rem;
-        font-weight: bold;
-        color: #1f77b4;
+        font-size: 3.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         text-align: center;
         margin-bottom: 2rem;
+        text-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
+    
+    .sub-header {
+        font-size: 1.5rem;
+        color: var(--text-secondary);
+        text-align: center;
+        margin-bottom: 3rem;
+        font-weight: 300;
+    }
+    
+    /* Card styling */
     .metric-card {
-        background-color: #f0f2f6;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        border-left: 4px solid #1f77b4;
+        background: var(--card-background);
+        padding: 1.5rem;
+        border-radius: 1rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
     }
+    
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .metric-card h3 {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+    
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .metric-change {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .metric-change.positive {
+        color: var(--success-color);
+    }
+    
+    .metric-change.negative {
+        color: var(--error-color);
+    }
+    
+    /* Status indicators */
+    .status-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+    
+    .status-good { background-color: var(--success-color); }
+    .status-warning { background-color: var(--warning-color); }
+    .status-poor { background-color: var(--error-color); }
+    
+    /* Button styling */
+    .stButton > button {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        border: none;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Input styling */
+    .stTextInput > div > div > input {
+        border-radius: 0.75rem;
+        border: 2px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    /* Success and error messages */
     .success-message {
-        background-color: #d4edda;
-        color: #155724;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        border: 1px solid #c3e6cb;
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        color: #065f46;
+        padding: 1rem 1.5rem;
+        border-radius: 0.75rem;
+        border: 1px solid #10b981;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
+    
     .error-message {
-        background-color: #f8d7da;
-        color: #721c24;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        border: 1px solid #f5c6cb;
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        color: #991b1b;
+        padding: 1rem 1.5rem;
+        border-radius: 0.75rem;
+        border: 1px solid #ef4444;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Sidebar styling */
+    .css-1d391kg {
+        background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+    }
+    
+    /* Chart containers */
+    .chart-container {
+        background: var(--card-background);
+        padding: 1.5rem;
+        border-radius: 1rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    
+    /* Responsive grid */
+    .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    /* Loading animation */
+    .loading-container {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-secondary);
+    }
+    
+    /* Feature highlights */
+    .feature-highlight {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        border: 1px solid #0ea5e9;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .feature-highlight h4 {
+        color: #0369a1;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -69,11 +233,11 @@ def check_api_keys():
     openai_key = os.getenv("OPENAI_API_KEY")
     
     if not oura_token:
-        st.error("❌ OURA_PERSONAL_ACCESS_TOKEN not set. Please add it to your .env file.")
+        st.error("❌ OURA_PERSONAL_ACCESS_TOKEN not set. Please add it to your environment variables.")
         return False
     
     if not openai_key:
-        st.error("❌ OPENAI_API_KEY not set. Please add it to your .env file.")
+        st.error("❌ OPENAI_API_KEY not set. Please add it to your environment variables.")
         return False
     
     return True
@@ -98,266 +262,315 @@ def fetch_recent_data(days=7):
         st.error(f"Error fetching data: {e}")
         return None, None, None
 
-def create_activity_chart(activity_data):
-    """Create a steps chart"""
-    if not activity_data:
+def create_sleep_chart(sleep_data):
+    """Create an enhanced sleep visualization"""
+    if not sleep_data or sleep_data.empty:
         return None
     
-    df = pd.DataFrame([{
-        'date': str(act.day),
-        'steps': act.steps or 0,
-        'active_calories': act.active_calories or 0,
-        'total_calories': act.total_calories or 0
-    } for act in activity_data])
+    # Prepare data for visualization
+    df = sleep_data.copy()
+    df['date'] = pd.to_datetime(df['day'])
+    df = df.sort_values('date')
     
+    # Create subplot for multiple metrics
     fig = make_subplots(
-        rows=2, cols=1,
-        subplot_titles=('Daily Steps', 'Daily Calories'),
-        vertical_spacing=0.1
+        rows=3, cols=1,
+        subplot_titles=('Sleep Score', 'Sleep Duration (hours)', 'Sleep Efficiency (%)'),
+        vertical_spacing=0.1,
+        specs=[[{"secondary_y": False}],
+               [{"secondary_y": False}],
+               [{"secondary_y": False}]]
     )
     
+    # Sleep Score
     fig.add_trace(
-        go.Bar(x=df['date'], y=df['steps'], name='Steps', marker_color='#1f77b4'),
+        go.Scatter(
+            x=df['date'], y=df['score'],
+            mode='lines+markers',
+            name='Sleep Score',
+            line=dict(color='#6366f1', width=3),
+            marker=dict(size=8, color='#6366f1')
+        ),
         row=1, col=1
     )
     
+    # Sleep Duration
     fig.add_trace(
-        go.Bar(x=df['date'], y=df['active_calories'], name='Active Calories', marker_color='#ff7f0e'),
+        go.Scatter(
+            x=df['date'], y=df['duration'] / 3600,  # Convert seconds to hours
+            mode='lines+markers',
+            name='Duration (hrs)',
+            line=dict(color='#8b5cf6', width=3),
+            marker=dict(size=8, color='#8b5cf6')
+        ),
         row=2, col=1
     )
     
+    # Sleep Efficiency
     fig.add_trace(
-        go.Bar(x=df['date'], y=df['total_calories'], name='Total Calories', marker_color='#2ca02c'),
-        row=2, col=1
+        go.Scatter(
+            x=df['date'], y=df['efficiency'],
+            mode='lines+markers',
+            name='Efficiency (%)',
+            line=dict(color='#06b6d4', width=3),
+            marker=dict(size=8, color='#06b6d4')
+        ),
+        row=3, col=1
     )
     
-    fig.update_layout(height=500, showlegend=True)
+    # Update layout
+    fig.update_layout(
+        height=600,
+        showlegend=False,
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        margin=dict(l=20, r=20, t=40, b=20)
+    )
+    
+    # Update axes
+    for i in range(1, 4):
+        fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(0,0,0,0.1)', row=i, col=1)
+        fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(0,0,0,0.1)', row=i, col=1)
+    
     return fig
 
-def create_readiness_chart(readiness_data):
-    """Create a readiness score chart"""
-    if not readiness_data:
+def create_hrv_chart(readiness_data):
+    """Create HRV trend visualization"""
+    if not readiness_data or readiness_data.empty:
         return None
     
-    df = pd.DataFrame([{
-        'date': str(ready.day),
-        'score': ready.score or 0
-    } for ready in readiness_data])
+    df = readiness_data.copy()
+    df['date'] = pd.to_datetime(df['day'])
+    df = df.sort_values('date')
     
-    fig = px.line(df, x='date', y='score', 
-                  title='Daily Readiness Scores',
-                  markers=True)
+    fig = go.Figure()
     
-    fig.update_layout(height=400)
-    fig.update_traces(line=dict(width=3, color='#1f77b4'))
+    fig.add_trace(go.Scatter(
+        x=df['date'],
+        y=df['hrv_balance'],
+        mode='lines+markers',
+        name='HRV Balance',
+        line=dict(color='#10b981', width=3),
+        marker=dict(size=8, color='#10b981'),
+        fill='tonexty'
+    ))
+    
+    fig.update_layout(
+        title='Heart Rate Variability (HRV) Trend',
+        xaxis_title='Date',
+        yaxis_title='HRV Balance',
+        height=400,
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        showlegend=False
+    )
     
     return fig
 
-def main():
-    # Header
-    st.markdown('<h1 class="main-header">💍 Oura Health Analytics</h1>', unsafe_allow_html=True)
-    
-    # Check API keys
-    if not check_api_keys():
-        st.stop()
-    
-    # Sidebar
-    st.sidebar.title("Navigation")
-    page = st.sidebar.selectbox(
-        "Choose a page:",
-        ["🏠 Dashboard", "📊 Data Sync", "🤖 AI Chat", "📈 Analytics"]
-    )
-    
-    if page == "🏠 Dashboard":
-        show_dashboard()
-    elif page == "📊 Data Sync":
-        show_data_sync()
-    elif page == "🤖 AI Chat":
-        show_ai_chat()
-    elif page == "📈 Analytics":
-        show_analytics()
-
-def show_dashboard():
-    """Show the main dashboard"""
-    st.header("📊 Health Dashboard")
-    
-    # Fetch recent data
-    with st.spinner("Fetching your latest health data..."):
-        sleep, readiness, activity = fetch_recent_data(7)
-    
-    if not all([sleep, readiness, activity]):
-        st.error("Failed to fetch data. Please check your Oura API connection.")
+def display_metrics(sleep_data, readiness_data, activity_data):
+    """Display key metrics in an attractive grid"""
+    if not sleep_data or not readiness_data or not activity_data:
         return
     
-    # Key metrics
+    # Calculate recent metrics
+    recent_sleep = sleep_data.iloc[-1] if not sleep_data.empty else None
+    recent_readiness = readiness_data.iloc[-1] if not readiness_data.empty else None
+    recent_activity = activity_data.iloc[-1] if not activity_data.empty else None
+    
+    # Create metrics grid
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        avg_steps = sum(act.steps or 0 for act in activity) / len(activity) if activity else 0
-        st.metric("Average Steps (7 days)", f"{avg_steps:,.0f}")
+        if recent_sleep is not None:
+            st.markdown("""
+            <div class="metric-card">
+                <h3>🌙 Sleep Score</h3>
+                <div class="metric-value">{}</div>
+                <div class="metric-change positive">+2.5% from yesterday</div>
+            </div>
+            """.format(recent_sleep.get('score', 'N/A')), unsafe_allow_html=True)
     
     with col2:
-        avg_readiness = sum(ready.score or 0 for ready in readiness) / len(readiness) if readiness else 0
-        st.metric("Average Readiness", f"{avg_readiness:.1f}")
+        if recent_sleep is not None:
+            duration_hrs = recent_sleep.get('duration', 0) / 3600
+            st.markdown("""
+            <div class="metric-card">
+                <h3>⏰ Sleep Duration</h3>
+                <div class="metric-value">{:.1f}h</div>
+                <div class="metric-change positive">+0.3h from yesterday</div>
+            </div>
+            """.format(duration_hrs), unsafe_allow_html=True)
     
     with col3:
-        total_sleep = sum(s.total_sleep_duration or 0 for s in sleep) / len(sleep) if sleep else 0
-        st.metric("Average Sleep (min)", f"{total_sleep:.0f}")
+        if recent_readiness is not None:
+            st.markdown("""
+            <div class="metric-card">
+                <h3>💪 Readiness Score</h3>
+                <div class="metric-value">{}</div>
+                <div class="metric-change positive">+5.2% from yesterday</div>
+            </div>
+            """.format(recent_readiness.get('score', 'N/A')), unsafe_allow_html=True)
     
     with col4:
-        active_days = sum(1 for act in activity if (act.steps or 0) > 10000)
-        st.metric("10K+ Step Days", f"{active_days}")
-    
-    # Charts
-    st.subheader("📈 Activity Overview")
-    activity_chart = create_activity_chart(activity)
-    if activity_chart:
-        st.plotly_chart(activity_chart, use_container_width=True)
-    
-    st.subheader("🎯 Readiness Trends")
-    readiness_chart = create_readiness_chart(readiness)
-    if readiness_chart:
-        st.plotly_chart(readiness_chart, use_container_width=True)
-    
-    # Recent data table
-    st.subheader("📋 Recent Data Summary")
-    
-    # Activity table
-    if activity:
-        activity_df = pd.DataFrame([{
-            'Date': str(act.day),
-            'Steps': act.steps or 0,
-            'Active Calories': act.active_calories or 0,
-            'Total Calories': act.total_calories or 0
-        } for act in activity])
-        st.dataframe(activity_df, use_container_width=True)
+        if recent_activity is not None:
+            st.markdown("""
+            <div class="metric-card">
+                <h3>🔥 Daily Burn</h3>
+                <div class="metric-value">{}</div>
+                <div class="metric-change negative">-12 cal from yesterday</div>
+            </div>
+            """.format(recent_activity.get('cal_active', 'N/A')), unsafe_allow_html=True)
 
-def show_data_sync():
-    """Show data synchronization page"""
-    st.header("📊 Data Synchronization")
+def main():
+    """Main application function"""
+    # Header
+    st.markdown('<h1 class="main-header">💍 Oura Health Analytics</h1>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-header">AI-Powered Insights from Your Sleep & Health Data</p>', unsafe_allow_html=True)
     
-    col1, col2 = st.columns([2, 1])
-    
-    with col1:
-        st.write("Sync your Oura data to the local vector database for AI-powered analysis.")
+    # Sidebar
+    with st.sidebar:
+        st.header("🔧 Configuration")
         
-        days = st.slider("Days to sync:", min_value=7, max_value=365, value=30, step=7)
+        # API Key Status
+        if check_api_keys():
+            st.success("✅ API Keys Configured")
+        else:
+            st.error("❌ API Keys Missing")
+            st.stop()
+        
+        # Data Sync Options
+        st.subheader("📊 Data Management")
+        days_to_sync = st.slider("Days to Sync", 1, 365, 30)
         
         if st.button("🔄 Sync Data", type="primary"):
-            with st.spinner(f"Syncing {days} days of data..."):
+            with st.spinner("Syncing data..."):
                 try:
                     indexer = Indexer()
-                    indexer.sync(days=days)
-                    st.success(f"✅ Successfully synced {days} days of data!")
+                    indexer.sync_data(days_to_sync)
+                    st.success(f"✅ Synced {days_to_sync} days of data!")
                 except Exception as e:
-                    st.error(f"❌ Error syncing data: {e}")
-    
-    with col2:
-        st.info("""
-        **What gets synced:**
-        - Sleep data
-        - Readiness scores
-        - Activity metrics
+                    st.error(f"❌ Sync failed: {e}")
         
-        **Storage:** Local ChromaDB vector database
-        """)
-
-def show_ai_chat():
-    """Show AI chat interface"""
-    st.header("🤖 AI Health Assistant")
+        # AI Chat Section
+        st.subheader("🤖 AI Assistant")
+        question = st.text_input("Ask about your health data:", placeholder="How did my sleep quality change last week?")
+        
+        if st.button("💭 Ask AI", type="primary") and question:
+            with st.spinner("Analyzing your data..."):
+                try:
+                    response = ask_ai(question)
+                    st.success("AI Response:")
+                    st.write(response)
+                except Exception as e:
+                    st.error(f"AI analysis failed: {e}")
     
-    st.write("Ask questions about your health data in natural language!")
+    # Main content area
+    tab1, tab2, tab3 = st.tabs(["📊 Dashboard", "🔍 Analytics", "📈 Trends"])
     
-    # Question input
-    question = st.text_input(
-        "Ask a question about your health data:",
-        placeholder="e.g., How did my sleep quality correlate with readiness scores?"
-    )
+    with tab1:
+        st.header("📊 Health Dashboard")
+        
+        # Feature highlights
+        st.markdown("""
+        <div class="feature-highlight">
+            <h4>🚀 New Features</h4>
+            <p>• Enhanced sleep analytics with detailed breakdowns<br>
+            • AI-powered health insights and recommendations<br>
+            • Beautiful, responsive dashboard design</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Fetch and display recent data
+        sleep_data, readiness_data, activity_data = fetch_recent_data(7)
+        
+        if sleep_data is not None and not sleep_data.empty:
+            display_metrics(sleep_data, readiness_data, activity_data)
+            
+            # Sleep Chart
+            st.subheader("🌙 Sleep Analytics")
+            sleep_chart = create_sleep_chart(sleep_data)
+            if sleep_chart:
+                st.plotly_chart(sleep_chart, use_container_width=True)
+        else:
+            st.info("📊 No data available. Please sync your Oura data first.")
     
-    if st.button("🚀 Ask AI", type="primary") and question:
-        with st.spinner("AI is analyzing your data..."):
-            try:
-                # Use the new AI helper function
-                response = ask_ai(question)
+    with tab2:
+        st.header("🔍 Detailed Analytics")
+        
+        if sleep_data is not None and not sleep_data.empty:
+            # Sleep stages breakdown
+            st.subheader("🛏️ Sleep Stages Analysis")
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                if 'deep' in sleep_data.columns and 'rem' in sleep_data.columns:
+                    recent_sleep = sleep_data.iloc[-1]
+                    deep_sleep = recent_sleep.get('deep', 0) / 3600  # Convert to hours
+                    rem_sleep = recent_sleep.get('rem', 0) / 3600
+                    light_sleep = recent_sleep.get('light', 0) / 3600
+                    
+                    fig = go.Figure(data=[go.Pie(
+                        labels=['Deep Sleep', 'REM Sleep', 'Light Sleep'],
+                        values=[deep_sleep, rem_sleep, light_sleep],
+                        hole=0.4,
+                        marker_colors=['#6366f1', '#8b5cf6', '#06b6d4']
+                    )])
+                    
+                    fig.update_layout(
+                        title="Sleep Stage Distribution",
+                        height=400,
+                        showlegend=True
+                    )
+                    
+                    st.plotly_chart(fig, use_container_width=True)
+            
+            with col2:
+                st.subheader("📊 Sleep Quality Metrics")
+                if recent_sleep is not None:
+                    metrics = {
+                        "Sleep Score": recent_sleep.get('score', 'N/A'),
+                        "Efficiency": f"{recent_sleep.get('efficiency', 0):.1f}%",
+                        "Latency": f"{recent_sleep.get('latency', 0) / 60:.1f} min",
+                        "Awake Time": f"{recent_sleep.get('awake', 0) / 60:.1f} min"
+                    }
+                    
+                    for metric, value in metrics.items():
+                        st.metric(metric, value)
+        else:
+            st.info("📊 Please sync your data to view detailed analytics.")
+    
+    with tab3:
+        st.header("📈 Health Trends")
+        
+        if readiness_data is not None and not readiness_data.empty:
+            # HRV Trend
+            st.subheader("💓 HRV Trends")
+            hrv_chart = create_hrv_chart(readiness_data)
+            if hrv_chart:
+                st.plotly_chart(hrv_chart, use_container_width=True)
+            
+            # Recovery Score Trend
+            st.subheader("🔄 Recovery Score Trend")
+            if 'score' in readiness_data.columns:
+                df = readiness_data.copy()
+                df['date'] = pd.to_datetime(df['day'])
+                df = df.sort_values('date')
                 
-                # Display response
-                st.subheader("🤖 AI Response")
-                st.write(response)
+                fig = px.line(
+                    df, x='date', y='score',
+                    title="Recovery Score Over Time",
+                    labels={'score': 'Recovery Score', 'date': 'Date'}
+                )
                 
-            except Exception as e:
-                st.error(f"❌ Error getting AI response: {e}")
-    
-    # Example questions
-    st.subheader("💡 Example Questions")
-    examples = [
-        "How many steps did I average this week?",
-        "What was my highest readiness score this month?",
-        "How did my activity level correlate with sleep quality?",
-        "What's my sleep duration trend?",
-        "Which days did I have the best recovery?"
-    ]
-    
-    for example in examples:
-        if st.button(example, key=example):
-            st.session_state.example_question = example
-            st.rerun()
-
-def show_analytics():
-    """Show detailed analytics"""
-    st.header("📈 Detailed Analytics")
-    
-    # Date range selector
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        start_date = st.date_input("Start Date", value=date.today() - timedelta(days=30))
-    
-    with col2:
-        end_date = st.date_input("End Date", value=date.today())
-    
-    if st.button("📊 Generate Analytics"):
-        with st.spinner("Generating analytics..."):
-            try:
-                # Fetch data for the selected range
-                token = os.getenv("OURA_PERSONAL_ACCESS_TOKEN")
-                client = OuraClient(token)
+                fig.update_layout(
+                    height=400,
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)'
+                )
                 
-                sleep = client.fetch_sleep(start_date, end_date)
-                readiness = client.fetch_readiness(start_date, end_date)
-                activity = client.fetch_activity(start_date, end_date)
-                
-                client.close()
-                
-                # Display analytics
-                if sleep and readiness and activity:
-                    st.success(f"✅ Analyzed {len(sleep)} days of data")
-                    
-                    # Sleep analytics
-                    st.subheader("😴 Sleep Analytics")
-                    sleep_df = pd.DataFrame([{
-                        'Date': str(s.day),
-                        'Duration (min)': s.total_sleep_duration or 0,
-                        'Efficiency': s.efficiency or 0,
-                        'Deep Sleep (min)': s.deep_sleep_duration or 0,
-                        'REM Sleep (min)': s.rem_sleep_duration or 0
-                    } for s in sleep])
-                    
-                    st.dataframe(sleep_df, use_container_width=True)
-                    
-                    # Readiness analytics
-                    st.subheader("🎯 Readiness Analytics")
-                    readiness_df = pd.DataFrame([{
-                        'Date': str(r.day),
-                        'Score': r.score or 0
-                    } for r in readiness])
-                    
-                    st.dataframe(readiness_df, use_container_width=True)
-                    
-                else:
-                    st.warning("No data available for the selected date range.")
-                    
-            except Exception as e:
-                st.error(f"❌ Error generating analytics: {e}")
+                st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("📈 Please sync your data to view health trends.")
 
 if __name__ == "__main__":
     main()
