@@ -1,0 +1,11 @@
+# Tell Render to ignore Python files and use Docker instead
+*.py
+requirements.txt
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv/
+env/
+venv/

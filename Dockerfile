@@ -10,6 +10,9 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Show Python version for debugging
+RUN python --version && pip --version
+
 # Copy requirements first for better caching
 COPY requirements.txt .
 
