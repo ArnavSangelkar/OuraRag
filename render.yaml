@@ -1,13 +1,9 @@
 services:
   - type: web
     name: oura-rag-app
-    env: python
+    env: docker
     plan: starter  # Free tier, upgrade as needed
-    pythonVersion: "3.11"
-    buildCommand: |
-      chmod +x build.sh
-      ./build.sh
-    startCommand: streamlit run streamlit_app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: SUPABASE_URL
         sync: false

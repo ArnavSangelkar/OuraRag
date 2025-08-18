@@ -3,8 +3,8 @@ uvicorn[standard]==0.24.0
 httpx==0.25.2
 pydantic==2.5.0
 python-dotenv==1.0.0
-pandas==2.1.4
-numpy==1.24.3
+pandas==1.5.3
+numpy==1.23.5
 langchain==0.0.350
 langchain-community==0.0.10
 langchain-openai==0.0.2
