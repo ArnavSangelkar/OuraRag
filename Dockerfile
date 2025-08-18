@@ -1,5 +1,5 @@
-# Use Python 3.11.18 specifically
-FROM python:3.11.18-slim
+# Use Python 3.11 specifically
+FROM python:3.11-slim
 
 # Set working directory
 WORKDIR /app
