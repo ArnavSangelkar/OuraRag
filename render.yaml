@@ -3,9 +3,10 @@ services:
     name: oura-rag-app
     env: python
     plan: starter  # Free tier, upgrade as needed
+    pythonVersion: "3.11"
     buildCommand: |
-      pip install --upgrade pip
-      pip install -r requirements.txt
+      chmod +x build.sh
+      ./build.sh
     startCommand: streamlit run streamlit_app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
     envVars:
       - key: SUPABASE_URL
