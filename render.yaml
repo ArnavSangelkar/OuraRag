@@ -25,10 +25,4 @@ services:
     autoDeploy: true
     numInstances: 1
     region: oregon  # Choose your preferred region
-    buildFilter:
-      paths:
-        - app/**
-        - streamlit_app.py
-        - requirements.txt
-        - render.yaml
 

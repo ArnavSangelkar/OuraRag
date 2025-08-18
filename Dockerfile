@@ -23,7 +23,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY . .
 
 # Expose port
-EXPOSE 8000
+EXPOSE $PORT
 
 # Set environment variables
 ENV PYTHONPATH=/app
@@ -32,4 +32,4 @@ ENV STREAMLIT_SERVER_ENABLE_CORS=false
 ENV STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION=false
 
 # Run the application
-CMD ["streamlit", "run", "streamlit_app.py", "--server.port", "8000", "--server.address", "0.0.0.0", "--server.headless", "true"]
+CMD streamlit run streamlit_app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
