@@ -192,3 +192,4 @@ if __name__ == "__main__":
     # insights = mcp.get_user_insights("user-uuid-here")
     # print(json.dumps(insights, indent=2))
 
+

@@ -133,3 +133,4 @@ class SupabaseClient:
             print(f"Error getting user settings: {e}")
             return None
 
+

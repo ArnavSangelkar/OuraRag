@@ -105,3 +105,4 @@ Get these from your Supabase project settings:
 - `SUPABASE_ANON_KEY`: Your anon/public key
 - `SUPABASE_SERVICE_ROLE_KEY`: Your service role key (keep secret)
 
+

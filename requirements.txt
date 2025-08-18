@@ -20,4 +20,3 @@ pgvector==0.2.4
 # Additional UI enhancements
 streamlit-option-menu==0.3.12
 streamlit-aggrid==0.3.4
-streamlit-plotly-events==0.0.8
