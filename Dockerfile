@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
 RUN python --version && pip --version
 
 # Copy requirements first for better caching
-COPY requirements.txt.bak requirements.txt
+COPY python_backup/requirements.txt.bak requirements.txt
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
@@ -23,8 +23,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy application code (from backup files)
-COPY streamlit_app.py.bak streamlit_app.py
+COPY python_backup/streamlit_app.py.bak streamlit_app.py
 COPY app.bak app
+COPY python_backup/ python_backup/
 COPY . .
 
 # Expose port
