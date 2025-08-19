@@ -26,6 +26,9 @@ class SleepSummary(BaseModel):
 class ReadinessSummary(BaseModel):
     day: date
     score: Optional[int] = None
+    average_hrv: Optional[float] = None
+    resting_heart_rate: Optional[int] = None
+    temperature_deviation: Optional[float] = None
 
 class ActivitySummary(BaseModel):
     day: date
@@ -100,7 +103,13 @@ class OuraClient:
         )
         parsed: List[ReadinessSummary] = []
         for item in raw:
-            parsed.append(ReadinessSummary(day=date.fromisoformat(item["day"]), score=item.get("score")))
+            parsed.append(ReadinessSummary(
+                day=date.fromisoformat(item["day"]), 
+                score=item.get("score"),
+                average_hrv=item.get("hrv_average") or item.get("average_hrv"),
+                resting_heart_rate=item.get("resting_heart_rate"),
+                temperature_deviation=item.get("temperature_deviation")
+            ))
         return parsed
 
     def fetch_activity(self, start_date: date, end_date: date) -> List[ActivitySummary]:

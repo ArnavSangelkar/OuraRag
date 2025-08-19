@@ -308,6 +308,12 @@ def fetch_recent_data(days=7):
         
         client.close()
         
+        # Debug: Print what data we actually got
+        if sleep and len(sleep) > 0:
+            st.write(f"🔍 Debug: Sleep data sample - Score: {getattr(sleep[0], 'score', 'N/A')}")
+        if readiness and len(readiness) > 0:
+            st.write(f"🔍 Debug: Readiness data sample - Score: {getattr(readiness[0], 'score', 'N/A')}, HRV: {getattr(readiness[0], 'average_hrv', 'N/A')}")
+        
         return sleep, readiness, activity
     except Exception as e:
         st.error(f"Error fetching data: {e}")
@@ -413,11 +419,15 @@ def create_hrv_chart(readiness_data):
     
     fig = go.Figure()
     
+    # Check if HRV data exists
+    if 'hrv' not in df.columns or df['hrv'].isna().all():
+        return None
+    
     fig.add_trace(go.Scatter(
         x=df['date'],
-        y=df['hrv_balance'],
+        y=df['hrv'],
         mode='lines+markers',
-        name='HRV Balance',
+        name='HRV',
         line=dict(color='#10b981', width=3),
         marker=dict(size=8, color='#10b981'),
         fill='tonexty'
@@ -426,7 +436,7 @@ def create_hrv_chart(readiness_data):
     fig.update_layout(
         title='Heart Rate Variability (HRV) Trend',
         xaxis_title='Date',
-        yaxis_title='HRV Balance',
+        yaxis_title='HRV (ms)',
         height=400,
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
