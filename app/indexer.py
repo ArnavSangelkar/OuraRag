@@ -46,6 +46,13 @@ class Indexer:
     def sync_data(self, days: int = DEFAULT_DAYS) -> None:
         """Alias for sync method to match Streamlit app expectations"""
         return self.sync(days)
+    
+    def clear_and_sync(self, days: int = DEFAULT_DAYS) -> None:
+        """Clear existing data and perform a fresh sync"""
+        print("🧹 Clearing existing vector store...")
+        self.vectorstore.clear_store()
+        print("✅ Vector store cleared")
+        return self.sync(days)
 
 if __name__ == "__main__":
     Indexer().sync()

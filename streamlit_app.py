@@ -524,7 +524,7 @@ def main():
         st.subheader("📊 Data Management")
         days_to_sync = st.slider("Days to Sync", 1, 365, 30, help="Select how many days of data to sync from Oura")
         
-        sync_col1, sync_col2 = st.columns([2, 1])
+        sync_col1, sync_col2, sync_col3 = st.columns([2, 1, 1])
         with sync_col1:
             if st.button("🔄 Sync Data", type="primary", use_container_width=True):
                 with st.spinner("Syncing data..."):
@@ -544,6 +544,16 @@ def main():
                         st.success("✅ Quick sync complete!")
                     except Exception as e:
                         st.error(f"❌ Quick sync failed: {e}")
+        
+        with sync_col3:
+            if st.button("🧹 Clear & Sync", help="Clear existing data and sync fresh", type="secondary"):
+                with st.spinner("Clearing and syncing..."):
+                    try:
+                        indexer = Indexer()
+                        indexer.clear_and_sync(days_to_sync)
+                        st.success(f"✅ Cleared and synced {days_to_sync} days!")
+                    except Exception as e:
+                        st.error(f"❌ Clear & sync failed: {e}")
         
         st.markdown("---")
         

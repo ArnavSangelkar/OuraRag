@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any, Dict, List
+from datetime import datetime
+import uuid
 from dotenv import load_dotenv
 
 from langchain_community.vectorstores import Chroma
@@ -30,12 +32,20 @@ class VectorStore:
     def add(self, chunks: List[DocumentChunk]) -> None:
         if not chunks:
             return
-        ids = [c.id for c in chunks]
-        # Best-effort delete to support idempotent re-syncs
+        
+        # Clear existing collection to avoid duplicate ID conflicts
         try:
-            self._store.delete(ids=ids)  # type: ignore[arg-type]
+            self._store.delete_collection()
+            self._store = Chroma(
+                collection_name="oura_rag",
+                embedding_function=self._embeddings,
+                persist_directory=self.persist_dir,
+            )
         except Exception:
             pass
+        
+        # Add new chunks with fresh collection
+        ids = [c.id for c in chunks]
         self._store.add_texts(
             texts=[c.content for c in chunks],
             metadatas=[c.metadata for c in chunks],
@@ -53,6 +63,26 @@ class VectorStore:
                 "score": float(score),
             })
         return payload
+    
+    def clear_store(self) -> None:
+        """Clear the entire vector store"""
+        try:
+            self._store.delete_collection()
+            self._store = Chroma(
+                collection_name="oura_rag",
+                embedding_function=self._embeddings,
+                persist_directory=self.persist_dir,
+            )
+        except Exception as e:
+            print(f"Warning: Could not clear store: {e}")
+    
+    def get_stats(self) -> dict:
+        """Get statistics about the vector store"""
+        try:
+            count = self._store._collection.count()
+            return {"total_documents": count}
+        except Exception:
+            return {"total_documents": 0}
 
 class Chunker:
     def __init__(self, chunk_size: int = 800, chunk_overlap: int = 80) -> None:
@@ -62,16 +92,20 @@ class Chunker:
 
     def from_rows(self, rows: List[dict], kind: str) -> List[DocumentChunk]:
         chunks: List[DocumentChunk] = []
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
         for row in rows:
             day = row.get("day")
             content = f"Type: {kind}\nDay: {day}\nData: {row}\n"
             parts = self.splitter.split_text(content)
             for idx, part in enumerate(parts):
+                # Generate unique ID with timestamp and UUID to avoid conflicts
+                unique_id = f"{kind}-{day}-{idx}-{timestamp}-{str(uuid.uuid4())[:8]}"
                 chunks.append(
                     DocumentChunk(
-                        id=f"{kind}-{day}-{idx}",
+                        id=unique_id,
                         content=part,
-                        metadata={"kind": kind, "day": str(day)},
+                        metadata={"kind": kind, "day": str(day), "timestamp": timestamp},
                     )
                 )
         return chunks
