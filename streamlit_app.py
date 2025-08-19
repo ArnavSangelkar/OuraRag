@@ -264,11 +264,22 @@ def fetch_recent_data(days=7):
 
 def create_sleep_chart(sleep_data):
     """Create an enhanced sleep visualization"""
-    if not sleep_data or sleep_data.empty:
+    if not sleep_data or len(sleep_data) == 0:
         return None
     
-    # Prepare data for visualization
-    df = sleep_data.copy()
+    # Convert list of dataclass objects to DataFrame
+    df = pd.DataFrame([{
+        'day': item.day,
+        'score': getattr(item, 'score', None),
+        'duration': getattr(item, 'total_sleep_duration', 0),
+        'efficiency': getattr(item, 'efficiency', 0),
+        'deep': getattr(item, 'deep_sleep_duration', 0),
+        'rem': getattr(item, 'rem_sleep_duration', 0),
+        'light': getattr(item, 'light_sleep_duration', 0),
+        'latency': getattr(item, 'latency', 0),
+        'awake': getattr(item, 'awake', 0)
+    } for item in sleep_data])
+    
     df['date'] = pd.to_datetime(df['day'])
     df = df.sort_values('date')
     
@@ -336,10 +347,16 @@ def create_sleep_chart(sleep_data):
 
 def create_hrv_chart(readiness_data):
     """Create HRV trend visualization"""
-    if not readiness_data or readiness_data.empty:
+    if not readiness_data or len(readiness_data) == 0:
         return None
     
-    df = readiness_data.copy()
+    # Convert list of dataclass objects to DataFrame
+    df = pd.DataFrame([{
+        'day': item.day,
+        'score': getattr(item, 'score', None),
+        'hrv': getattr(item, 'average_hrv', None)
+    } for item in readiness_data])
+    
     df['date'] = pd.to_datetime(df['day'])
     df = df.sort_values('date')
     
@@ -373,9 +390,9 @@ def display_metrics(sleep_data, readiness_data, activity_data):
         return
     
     # Calculate recent metrics
-    recent_sleep = sleep_data.iloc[-1] if not sleep_data.empty else None
-    recent_readiness = readiness_data.iloc[-1] if not readiness_data.empty else None
-    recent_activity = activity_data.iloc[-1] if not activity_data.empty else None
+    recent_sleep = sleep_data[-1] if len(sleep_data) > 0 else None
+    recent_readiness = readiness_data[-1] if len(readiness_data) > 0 else None
+    recent_activity = activity_data[-1] if len(activity_data) > 0 else None
     
     # Create metrics grid
     col1, col2, col3, col4 = st.columns(4)
@@ -388,11 +405,11 @@ def display_metrics(sleep_data, readiness_data, activity_data):
                 <div class="metric-value">{}</div>
                 <div class="metric-change positive">+2.5% from yesterday</div>
             </div>
-            """.format(recent_sleep.get('score', 'N/A')), unsafe_allow_html=True)
+            """.format(getattr(recent_sleep, 'score', 'N/A')), unsafe_allow_html=True)
     
     with col2:
         if recent_sleep is not None:
-            duration_hrs = recent_sleep.get('duration', 0) / 3600
+            duration_hrs = getattr(recent_sleep, 'total_sleep_duration', 0) / 3600
             st.markdown("""
             <div class="metric-card">
                 <h3>⏰ Sleep Duration</h3>
@@ -409,7 +426,7 @@ def display_metrics(sleep_data, readiness_data, activity_data):
                 <div class="metric-value">{}</div>
                 <div class="metric-change positive">+5.2% from yesterday</div>
             </div>
-            """.format(recent_readiness.get('score', 'N/A')), unsafe_allow_html=True)
+            """.format(getattr(recent_readiness, 'score', 'N/A')), unsafe_allow_html=True)
     
     with col4:
         if recent_activity is not None:
@@ -419,7 +436,7 @@ def display_metrics(sleep_data, readiness_data, activity_data):
                 <div class="metric-value">{}</div>
                 <div class="metric-change negative">-12 cal from yesterday</div>
             </div>
-            """.format(recent_activity.get('cal_active', 'N/A')), unsafe_allow_html=True)
+            """.format(getattr(recent_activity, 'active_calories', 'N/A')), unsafe_allow_html=True)
 
 def main():
     """Main application function"""
@@ -483,7 +500,7 @@ def main():
         # Fetch and display recent data
         sleep_data, readiness_data, activity_data = fetch_recent_data(7)
         
-        if sleep_data is not None and not sleep_data.empty:
+        if sleep_data is not None and len(sleep_data) > 0:
             display_metrics(sleep_data, readiness_data, activity_data)
             
             # Sleep Chart
@@ -497,7 +514,7 @@ def main():
     with tab2:
         st.header("🔍 Detailed Analytics")
         
-        if sleep_data is not None and not sleep_data.empty:
+        if sleep_data is not None and len(sleep_data) > 0:
             # Sleep stages breakdown
             st.subheader("🛏️ Sleep Stages Analysis")
             col1, col2 = st.columns(2)
@@ -542,7 +559,7 @@ def main():
     with tab3:
         st.header("📈 Health Trends")
         
-        if readiness_data is not None and not readiness_data.empty:
+        if readiness_data is not None and len(readiness_data) > 0:
             # HRV Trend
             st.subheader("💓 HRV Trends")
             hrv_chart = create_hrv_chart(readiness_data)
