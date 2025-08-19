@@ -656,13 +656,25 @@ def main():
         st.header("🔍 Detailed Analytics")
         
         if sleep_data is not None and len(sleep_data) > 0:
+            # Convert list of dataclass objects to DataFrame for analysis
+            sleep_df = pd.DataFrame([{
+                'day': item.day,
+                'score': getattr(item, 'score', None),
+                'deep': getattr(item, 'deep_sleep_duration', 0),
+                'rem': getattr(item, 'rem_sleep_duration', 0),
+                'light': getattr(item, 'light_sleep_duration', 0),
+                'efficiency': getattr(item, 'efficiency', 0),
+                'latency': getattr(item, 'latency', 0),
+                'awake': getattr(item, 'awake', 0)
+            } for item in sleep_data])
+            
             # Sleep stages breakdown
             st.subheader("🛏️ Sleep Stages Analysis")
             col1, col2 = st.columns(2)
             
             with col1:
-                if 'deep' in sleep_data.columns and 'rem' in sleep_data.columns:
-                    recent_sleep = sleep_data.iloc[-1]
+                if 'deep' in sleep_df.columns and 'rem' in sleep_df.columns:
+                    recent_sleep = sleep_df.iloc[-1]
                     deep_sleep = recent_sleep.get('deep', 0) / 3600  # Convert to hours
                     rem_sleep = recent_sleep.get('rem', 0) / 3600
                     light_sleep = recent_sleep.get('light', 0) / 3600
@@ -684,7 +696,8 @@ def main():
             
             with col2:
                 st.subheader("📊 Sleep Quality Metrics")
-                if recent_sleep is not None:
+                if len(sleep_df) > 0:
+                    recent_sleep = sleep_df.iloc[-1]
                     metrics = {
                         "Sleep Score": recent_sleep.get('score', 'N/A'),
                         "Efficiency": f"{recent_sleep.get('efficiency', 0):.1f}%",
@@ -802,26 +815,33 @@ def main():
             
             # Recovery Score Trend
             st.subheader("🔄 Recovery Score Trend")
-            if 'score' in readiness_data.columns:
-                df = readiness_data.copy()
-                df['date'] = pd.to_datetime(df['day'])
-                df = df.sort_values('date')
+            if readiness_data is not None and len(readiness_data) > 0:
+                # Convert list of dataclass objects to DataFrame
+                readiness_df = pd.DataFrame([{
+                    'day': item.day,
+                    'score': getattr(item, 'score', None)
+                } for item in readiness_data])
                 
-                fig = px.line(
-                    df, x='date', y='score',
-                    title="Recovery Score Over Time",
-                    labels={'score': 'Recovery Score', 'date': 'Date'}
-                )
-                
-                fig.update_layout(
-                    height=400,
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    paper_bgcolor='rgba(0,0,0,0)'
-                )
-                
-                st.plotly_chart(fig, use_container_width=True)
-        else:
-            st.info("📈 Please sync your data to view health trends.")
+                if 'score' in readiness_df.columns:
+                    df = readiness_df.copy()
+                    df['date'] = pd.to_datetime(df['day'])
+                    df = df.sort_values('date')
+                    
+                    fig = px.line(
+                        df, x='date', y='score',
+                        title="Recovery Score Over Time",
+                        labels={'score': 'Recovery Score', 'date': 'Date'}
+                    )
+                    
+                    fig.update_layout(
+                        height=400,
+                        plot_bgcolor='rgba(0,0,0,0)',
+                        paper_bgcolor='rgba(0,0,0,0)'
+                    )
+                    
+                    st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("📈 Please sync your data to view health trends.")
 
 if __name__ == "__main__":
     main()
