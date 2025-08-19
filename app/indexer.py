@@ -43,6 +43,10 @@ class Indexer:
         self.vectorstore.add(chunks)
         print(f"Indexed {len(chunks)} chunks from {len(sleep_rows)} sleep, {len(readiness_rows)} readiness, {len(activity_rows)} activity rows.")
 
+    def sync_data(self, days: int = DEFAULT_DAYS) -> None:
+        """Alias for sync method to match Streamlit app expectations"""
+        return self.sync(days)
+
 if __name__ == "__main__":
     Indexer().sync()
 

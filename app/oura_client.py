@@ -12,6 +12,7 @@ OURA_BASE_URL = "https://api.ouraring.com/v2"
 class SleepSummary(BaseModel):
     day: date
     total_sleep_duration: int
+    score: Optional[int] = None
     efficiency: Optional[float] = None
     latency: Optional[int] = None
     deep_sleep_duration: Optional[int] = None
@@ -79,6 +80,7 @@ class OuraClient:
                 SleepSummary(
                     day=date.fromisoformat(item["day"]),
                     total_sleep_duration=item.get("total_sleep_duration", 0),
+                    score=item.get("score"),
                     efficiency=item.get("efficiency"),
                     latency=item.get("latency"),
                     deep_sleep_duration=item.get("deep_sleep_duration"),
