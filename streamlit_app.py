@@ -180,6 +180,57 @@ st.markdown("""
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     
+    /* Enhanced chart containers */
+    .chart-container {
+        background: var(--card-background);
+        padding: 1.5rem;
+        border-radius: 1rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        margin: 1rem 0;
+    }
+    
+    /* Sidebar enhancements */
+    .css-1d391kg {
+        background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+    }
+    
+    /* Data table styling */
+    .dataframe {
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Loading spinner enhancement */
+    .stSpinner > div {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid var(--primary-color);
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Responsive grid improvements */
+    .row-widget.stHorizontal {
+        gap: 1rem;
+    }
+    
+    /* Enhanced sidebar buttons */
+    .css-1d391kg .stButton > button {
+        background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+        margin: 0.5rem 0;
+        width: 100%;
+    }
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
     /* Sidebar styling */
     .css-1d391kg {
         background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
@@ -444,72 +495,152 @@ def main():
     st.markdown('<h1 class="main-header">💍 Oura Health Analytics</h1>', unsafe_allow_html=True)
     st.markdown('<p class="sub-header">AI-Powered Insights from Your Sleep & Health Data</p>', unsafe_allow_html=True)
     
-    # Sidebar
+    # Enhanced Sidebar with better organization
     with st.sidebar:
-        st.header("🔧 Configuration")
+        st.markdown("""
+        <div style="text-align: center; padding: 1rem 0;">
+            <h2 style="color: #6366f1; margin-bottom: 0;">💍 Oura RAG</h2>
+            <p style="color: #64748b; font-size: 0.9rem;">AI-Powered Health Analytics</p>
+        </div>
+        """, unsafe_allow_html=True)
         
-        # API Key Status
+        st.markdown("---")
+        
+        # API Key Status with better styling
+        st.subheader("🔑 API Status")
         if check_api_keys():
-            st.success("✅ API Keys Configured")
+            st.markdown("""
+            <div style="background: #d1fae5; color: #065f46; padding: 0.5rem; border-radius: 0.5rem; text-align: center;">
+                ✅ All APIs Connected
+            </div>
+            """, unsafe_allow_html=True)
         else:
             st.error("❌ API Keys Missing")
             st.stop()
         
-        # Data Sync Options
+        st.markdown("---")
+        
+        # Enhanced Data Sync Options
         st.subheader("📊 Data Management")
-        days_to_sync = st.slider("Days to Sync", 1, 365, 30)
+        days_to_sync = st.slider("Days to Sync", 1, 365, 30, help="Select how many days of data to sync from Oura")
         
-        if st.button("🔄 Sync Data", type="primary"):
-            with st.spinner("Syncing data..."):
-                try:
-                    indexer = Indexer()
-                    indexer.sync_data(days_to_sync)
-                    st.success(f"✅ Synced {days_to_sync} days of data!")
-                except Exception as e:
-                    st.error(f"❌ Sync failed: {e}")
+        sync_col1, sync_col2 = st.columns([2, 1])
+        with sync_col1:
+            if st.button("🔄 Sync Data", type="primary", use_container_width=True):
+                with st.spinner("Syncing data..."):
+                    try:
+                        indexer = Indexer()
+                        indexer.sync_data(days_to_sync)
+                        st.success(f"✅ Synced {days_to_sync} days!")
+                    except Exception as e:
+                        st.error(f"❌ Sync failed: {e}")
         
-        # AI Chat Section
+        with sync_col2:
+            if st.button("🔄 Quick Sync", help="Sync last 7 days"):
+                with st.spinner("Quick syncing..."):
+                    try:
+                        indexer = Indexer()
+                        indexer.sync_data(7)
+                        st.success("✅ Quick sync complete!")
+                    except Exception as e:
+                        st.error(f"❌ Quick sync failed: {e}")
+        
+        st.markdown("---")
+        
+        # Enhanced AI Chat Section
         st.subheader("🤖 AI Assistant")
-        question = st.text_input("Ask about your health data:", placeholder="How did my sleep quality change last week?")
+        question = st.text_input("Ask about your health:", placeholder="How did my sleep quality change last week?")
         
-        if st.button("💭 Ask AI", type="primary") and question:
+        if st.button("💭 Ask AI", type="primary", use_container_width=True) and question:
             with st.spinner("Analyzing your data..."):
                 try:
                     response = ask_ai(question)
-                    st.success("AI Response:")
-                    st.write(response)
+                    st.markdown("""
+                    <div style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 0.5rem; padding: 1rem;">
+                        <h4 style="color: #0369a1; margin-bottom: 0.5rem;">🤖 AI Response:</h4>
+                        <p style="color: #0c4a6e;">{}</p>
+                    </div>
+                    """.format(response), unsafe_allow_html=True)
                 except Exception as e:
                     st.error(f"AI analysis failed: {e}")
+        
+        st.markdown("---")
+        
+        # Quick Stats
+        st.subheader("📈 Quick Stats")
+        try:
+            sleep_data, readiness_data, activity_data = fetch_recent_data(1)
+            if sleep_data and len(sleep_data) > 0:
+                recent_sleep = sleep_data[-1]
+                st.metric("Last Sleep Score", f"{getattr(recent_sleep, 'score', 'N/A')}")
+                st.metric("Sleep Duration", f"{getattr(recent_sleep, 'total_sleep_duration', 0) / 3600:.1f}h")
+        except:
+            st.info("No recent data")
     
-    # Main content area
-    tab1, tab2, tab3 = st.tabs(["📊 Dashboard", "🔍 Analytics", "📈 Trends"])
+    # Main content area with enhanced tabs
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "🔍 Analytics", "📈 Trends", "🤖 AI Insights"])
     
     with tab1:
         st.header("📊 Health Dashboard")
         
-        # Feature highlights
-        st.markdown("""
-        <div class="feature-highlight">
-            <h4>🚀 New Features</h4>
-            <p>• Enhanced sleep analytics with detailed breakdowns<br>
-            • AI-powered health insights and recommendations<br>
-            • Beautiful, responsive dashboard design</p>
-        </div>
-        """, unsafe_allow_html=True)
+        # Enhanced feature highlights with icons and better layout
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown("""
+            <div class="feature-highlight">
+                <h4>🌙 Sleep Analytics</h4>
+                <p>• Deep sleep tracking<br>
+                • REM cycle analysis<br>
+                • Sleep efficiency metrics</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown("""
+            <div class="feature-highlight">
+                <h4>💪 Readiness Score</h4>
+                <p>• Daily readiness tracking<br>
+                • Recovery insights<br>
+                • Training recommendations</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            st.markdown("""
+            <div class="feature-highlight">
+                <h4>🚶 Activity Metrics</h4>
+                <p>• Step counting<br>
+                • Calorie tracking<br>
+                • MET analysis</p>
+            </div>
+            """, unsafe_allow_html=True)
         
         # Fetch and display recent data
         sleep_data, readiness_data, activity_data = fetch_recent_data(7)
         
         if sleep_data is not None and len(sleep_data) > 0:
+            # Enhanced metrics display with better spacing
+            st.markdown('<div class="chart-container">', unsafe_allow_html=True)
             display_metrics(sleep_data, readiness_data, activity_data)
+            st.markdown('</div>', unsafe_allow_html=True)
             
-            # Sleep Chart
+            # Enhanced sleep chart with container styling
             st.subheader("🌙 Sleep Analytics")
+            st.markdown('<div class="chart-container">', unsafe_allow_html=True)
             sleep_chart = create_sleep_chart(sleep_data)
             if sleep_chart:
                 st.plotly_chart(sleep_chart, use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
         else:
-            st.info("📊 No data available. Please sync your Oura data first.")
+            # Enhanced empty state
+            st.markdown("""
+            <div class="loading-container">
+                <h3>📊 No Data Available</h3>
+                <p>Please sync your Oura data to see your health insights.</p>
+                <p>Click the "Sync Data" button in the sidebar to get started.</p>
+            </div>
+            """, unsafe_allow_html=True)
     
     with tab2:
         st.header("🔍 Detailed Analytics")
@@ -565,6 +696,99 @@ def main():
             hrv_chart = create_hrv_chart(readiness_data)
             if hrv_chart:
                 st.plotly_chart(hrv_chart, use_container_width=True)
+        else:
+            st.info("📊 Please sync your data to view health trends.")
+    
+    with tab4:
+        st.header("🤖 AI-Powered Insights")
+        
+        # AI Analysis Section
+        st.markdown("""
+        <div class="feature-highlight">
+            <h4>🧠 AI Health Analysis</h4>
+            <p>Get personalized insights and recommendations based on your health data patterns.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Pre-defined AI questions for quick insights
+        st.subheader("💡 Quick Insights")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("🌙 Sleep Quality Analysis", use_container_width=True):
+                with st.spinner("Analyzing sleep patterns..."):
+                    try:
+                        response = ask_ai("Analyze my sleep quality trends and provide recommendations for improvement.")
+                        st.markdown("""
+                        <div class="chart-container">
+                            <h4>🌙 Sleep Quality Analysis</h4>
+                            <p>{}</p>
+                        </div>
+                        """.format(response), unsafe_allow_html=True)
+                    except Exception as e:
+                        st.error(f"Analysis failed: {e}")
+            
+            if st.button("💪 Recovery Insights", use_container_width=True):
+                with st.spinner("Analyzing recovery patterns..."):
+                    try:
+                        response = ask_ai("What are my recovery patterns and how can I optimize them?")
+                        st.markdown("""
+                        <div class="chart-container">
+                            <h4>💪 Recovery Insights</h4>
+                            <p>{}</p>
+                        </div>
+                        """.format(response), unsafe_allow_html=True)
+                    except Exception as e:
+                        st.error(f"Analysis failed: {e}")
+        
+        with col2:
+            if st.button("🚶 Activity Optimization", use_container_width=True):
+                with st.spinner("Analyzing activity patterns..."):
+                    try:
+                        response = ask_ai("How can I optimize my daily activity and exercise routine?")
+                        st.markdown("""
+                        <div class="chart-container">
+                            <h4>🚶 Activity Optimization</h4>
+                            <p>{}</p>
+                        </div>
+                        """.format(response), unsafe_allow_html=True)
+                    except Exception as e:
+                        st.error(f"Analysis failed: {e}")
+            
+            if st.button("🎯 Personalized Goals", use_container_width=True):
+                with st.spinner("Generating personalized goals..."):
+                    try:
+                        response = ask_ai("Based on my health data, what are some personalized health goals I should set?")
+                        st.markdown("""
+                        <div class="chart-container">
+                            <h4>🎯 Personalized Goals</h4>
+                            <p>{}</p>
+                        </div>
+                        """.format(response), unsafe_allow_html=True)
+                    except Exception as e:
+                        st.error(f"Analysis failed: {e}")
+        
+        # Custom AI Analysis
+        st.subheader("🔍 Custom Analysis")
+        custom_question = st.text_area(
+            "Ask a specific question about your health data:",
+            placeholder="e.g., How does my sleep quality correlate with my readiness scores?",
+            height=100
+        )
+        
+        if st.button("🧠 Analyze", type="primary", use_container_width=True) and custom_question:
+            with st.spinner("Performing custom analysis..."):
+                try:
+                    response = ask_ai(custom_question)
+                    st.markdown("""
+                    <div class="chart-container">
+                        <h4>🔍 Custom Analysis Result</h4>
+                        <p>{}</p>
+                    </div>
+                    """.format(response), unsafe_allow_html=True)
+                except Exception as e:
+                    st.error(f"Custom analysis failed: {e}")
             
             # Recovery Score Trend
             st.subheader("🔄 Recovery Score Trend")
