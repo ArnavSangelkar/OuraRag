@@ -92,10 +92,10 @@ class OuraClient:
                     deep_sleep_duration=item.get("deep_sleep_duration") or item.get("deep_sleep"),
                     rem_sleep_duration=item.get("rem_sleep_duration") or item.get("rem_sleep"),
                     light_sleep_duration=item.get("light_sleep_duration") or item.get("light_sleep"),
-                    average_breath=item.get("average_breath") or item.get("breath_rate"),
-                    average_heart_rate=item.get("average_heart_rate") or item.get("heart_rate"),
-                    average_hrv=item.get("hrv_average") or item.get("average_hrv") or item.get("hrv"),
-                    resting_heart_rate=item.get("resting_heart_rate") or item.get("rest_heart_rate"),
+                    average_breath=extract_numeric_value(item.get("average_breath") or item.get("breath_rate")),
+                    average_heart_rate=extract_numeric_value(item.get("average_heart_rate") or item.get("heart_rate")),
+                    average_hrv=extract_numeric_value(item.get("hrv_average") or item.get("average_hrv") or item.get("hrv")),
+                    resting_heart_rate=extract_numeric_value(item.get("resting_heart_rate") or item.get("rest_heart_rate")),
                 )
             )
         return parsed
@@ -112,9 +112,9 @@ class OuraClient:
             parsed.append(ReadinessSummary(
                 day=date.fromisoformat(item["day"]), 
                 score=item.get("score") or item.get("readiness_score"),
-                average_hrv=item.get("hrv_average") or item.get("average_hrv") or item.get("hrv") or item.get("hrv_balance"),
-                resting_heart_rate=item.get("resting_heart_rate") or item.get("rest_heart_rate") or item.get("heart_rate"),
-                temperature_deviation=item.get("temperature_deviation") or item.get("temperature")
+                average_hrv=extract_numeric_value(item.get("hrv_average") or item.get("average_hrv") or item.get("hrv") or item.get("hrv_balance")),
+                resting_heart_rate=extract_numeric_value(item.get("resting_heart_rate") or item.get("rest_heart_rate") or item.get("heart_rate")),
+                temperature_deviation=extract_numeric_value(item.get("temperature_deviation") or item.get("temperature"))
             ))
         return parsed
 
@@ -138,4 +138,37 @@ class OuraClient:
 
     def close(self) -> None:
         self._client.close()
+
+
+def extract_numeric_value(data: Any, default: float = 0.0) -> float:
+    """Extract numeric value from Oura API response data"""
+    if data is None:
+        return default
+    
+    # If it's already a number, return it
+    if isinstance(data, (int, float)):
+        return float(data)
+    
+    # If it's a dict with time-series data, try to extract average
+    if isinstance(data, dict):
+        # Try common field names for averages
+        for field in ['average', 'mean', 'value', 'hrv', 'heart_rate']:
+            if field in data and isinstance(data[field], (int, float)):
+                return float(data[field])
+        
+        # If no average field, try to calculate from items if available
+        if 'items' in data and isinstance(data['items'], list):
+            items = data['items']
+            if items and all(isinstance(item, dict) and 'value' in item for item in items):
+                values = [float(item['value']) for item in items if isinstance(item.get('value'), (int, float))]
+                if values:
+                    return sum(values) / len(values)
+    
+    # If it's a list, try to get the first numeric value
+    if isinstance(data, list) and data:
+        first_item = data[0]
+        if isinstance(first_item, dict) and 'value' in first_item:
+            return float(first_item['value'])
+    
+    return default
 
