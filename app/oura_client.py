@@ -79,20 +79,23 @@ class OuraClient:
         )
         parsed: List[SleepSummary] = []
         for item in raw:
+            # Debug: Print raw sleep data to see what's available
+            print(f"🔍 Raw sleep data: {item.keys()}")
+            
             parsed.append(
                 SleepSummary(
                     day=date.fromisoformat(item["day"]),
                     total_sleep_duration=item.get("total_sleep_duration", 0),
-                    score=item.get("score"),
-                    efficiency=item.get("efficiency"),
-                    latency=item.get("latency"),
-                    deep_sleep_duration=item.get("deep_sleep_duration"),
-                    rem_sleep_duration=item.get("rem_sleep_duration"),
-                    light_sleep_duration=item.get("light_sleep_duration"),
-                    average_breath=item.get("average_breath"),
-                    average_heart_rate=item.get("average_heart_rate"),
-                    average_hrv=item.get("hrv_average") or item.get("average_hrv"),
-                    resting_heart_rate=item.get("resting_heart_rate"),
+                    score=item.get("score") or item.get("sleep_score") or item.get("overall_score"),
+                    efficiency=item.get("efficiency") or item.get("sleep_efficiency"),
+                    latency=item.get("latency") or item.get("sleep_latency"),
+                    deep_sleep_duration=item.get("deep_sleep_duration") or item.get("deep_sleep"),
+                    rem_sleep_duration=item.get("rem_sleep_duration") or item.get("rem_sleep"),
+                    light_sleep_duration=item.get("light_sleep_duration") or item.get("light_sleep"),
+                    average_breath=item.get("average_breath") or item.get("breath_rate"),
+                    average_heart_rate=item.get("average_heart_rate") or item.get("heart_rate"),
+                    average_hrv=item.get("hrv_average") or item.get("average_hrv") or item.get("hrv"),
+                    resting_heart_rate=item.get("resting_heart_rate") or item.get("rest_heart_rate"),
                 )
             )
         return parsed
@@ -103,12 +106,15 @@ class OuraClient:
         )
         parsed: List[ReadinessSummary] = []
         for item in raw:
+            # Debug: Print raw readiness data to see what's available
+            print(f"🔍 Raw readiness data: {item.keys()}")
+            
             parsed.append(ReadinessSummary(
                 day=date.fromisoformat(item["day"]), 
-                score=item.get("score"),
-                average_hrv=item.get("hrv_average") or item.get("average_hrv"),
-                resting_heart_rate=item.get("resting_heart_rate"),
-                temperature_deviation=item.get("temperature_deviation")
+                score=item.get("score") or item.get("readiness_score"),
+                average_hrv=item.get("hrv_average") or item.get("average_hrv") or item.get("hrv") or item.get("hrv_balance"),
+                resting_heart_rate=item.get("resting_heart_rate") or item.get("rest_heart_rate") or item.get("heart_rate"),
+                temperature_deviation=item.get("temperature_deviation") or item.get("temperature")
             ))
         return parsed
 

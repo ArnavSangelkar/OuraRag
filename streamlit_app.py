@@ -310,9 +310,17 @@ def fetch_recent_data(days=7):
         
         # Debug: Print what data we actually got
         if sleep and len(sleep) > 0:
-            st.write(f"🔍 Debug: Sleep data sample - Score: {getattr(sleep[0], 'score', 'N/A')}")
+            sleep_score = getattr(sleep[0], 'score', 'N/A')
+            if sleep_score is None:
+                st.warning("⚠️ Sleep scores not available from Oura API. This is normal for some users.")
+            else:
+                st.write(f"🔍 Debug: Sleep data sample - Score: {sleep_score}")
         if readiness and len(readiness) > 0:
-            st.write(f"🔍 Debug: Readiness data sample - Score: {getattr(readiness[0], 'score', 'N/A')}, HRV: {getattr(readiness[0], 'average_hrv', 'N/A')}")
+            readiness_score = getattr(readiness[0], 'score', 'N/A')
+            hrv_value = getattr(readiness[0], 'average_hrv', 'N/A')
+            st.write(f"🔍 Debug: Readiness data sample - Score: {readiness_score}, HRV: {hrv_value}")
+            if hrv_value is None:
+                st.info("ℹ️ HRV data not available. This might require premium Oura membership.")
         
         return sleep, readiness, activity
     except Exception as e:
@@ -460,13 +468,23 @@ def display_metrics(sleep_data, readiness_data, activity_data):
     
     with col1:
         if recent_sleep is not None:
-            st.markdown("""
-            <div class="metric-card">
-                <h3>🌙 Sleep Score</h3>
-                <div class="metric-value">{}</div>
-                <div class="metric-change positive">+2.5% from yesterday</div>
-            </div>
-            """.format(getattr(recent_sleep, 'score', 'N/A')), unsafe_allow_html=True)
+            sleep_score = getattr(recent_sleep, 'score', None)
+            if sleep_score is not None:
+                st.markdown("""
+                <div class="metric-card">
+                    <h3>🌙 Sleep Score</h3>
+                    <div class="metric-value">{}</div>
+                    <div class="metric-change positive">+2.5% from yesterday</div>
+                </div>
+                """.format(sleep_score), unsafe_allow_html=True)
+            else:
+                st.markdown("""
+                <div class="metric-card">
+                    <h3>🌙 Sleep Score</h3>
+                    <div class="metric-value">N/A</div>
+                    <div class="metric-change">Score not available</div>
+                </div>
+                """, unsafe_allow_html=True)
     
     with col2:
         if recent_sleep is not None:
