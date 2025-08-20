@@ -582,10 +582,126 @@ def main():
             st.error("API Keys Missing")
             st.stop()
     
-    # Main content area with clean tabs
-    tab1, tab2, tab3, tab4 = st.tabs(["Dashboard", "Analytics", "Trends", "AI Insights"])
+    # Main content area with AI Insights as first tab
+    tab1, tab2, tab3, tab4 = st.tabs(["AI Insights", "Dashboard", "Analytics", "Trends"])
     
     with tab1:
+        st.header("AI-Powered Insights")
+        
+        # AI Analysis Section
+        st.markdown("""
+        <div class="feature-highlight">
+            <h4>AI Health Analysis</h4>
+            <p>Get personalized insights and recommendations based on your health data patterns.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Pre-defined AI questions for quick insights
+        st.subheader("Quick Insights")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("Sleep Quality Analysis", key="sleep_analysis", use_container_width=True):
+                try:
+                    response = ask_ai("Analyze my sleep quality trends and provide recommendations for improvement.")
+                    st.markdown("""
+                    <div class="chart-container">
+                        <h4>Sleep Quality Analysis</h4>
+                        <p style="color: #000000;">{}</p>
+                    </div>
+                    """.format(response), unsafe_allow_html=True)
+                except Exception as e:
+                    st.error(f"Analysis failed: {e}")
+            
+            if st.button("Recovery Insights", key="recovery_insights", use_container_width=True):
+                try:
+                    response = ask_ai("What are my recovery patterns and how can I optimize them?")
+                    st.markdown("""
+                    <div class="chart-container">
+                        <h4>Recovery Insights</h4>
+                        <p style="color: #000000;">{}</p>
+                    </div>
+                    """.format(response), unsafe_allow_html=True)
+                except Exception as e:
+                    st.error(f"Analysis failed: {e}")
+        
+        with col2:
+            if st.button("Activity Optimization", key="activity_optimization", use_container_width=True):
+                try:
+                    response = ask_ai("How can I optimize my daily activity and exercise routine?")
+                    st.markdown("""
+                    <div class="chart-container">
+                        <h4>Activity Optimization</h4>
+                        <p style="color: #000000;">{}</p>
+                    </div>
+                    """.format(response), unsafe_allow_html=True)
+                except Exception as e:
+                    st.error(f"Analysis failed: {e}")
+            
+            if st.button("Personalized Goals", key="personalized_goals", use_container_width=True):
+                try:
+                    response = ask_ai("Based on my health data, what are some personalized health goals I should set?")
+                    st.markdown("""
+                    <div class="chart-container">
+                        <h4>Personalized Goals</h4>
+                        <p style="color: #000000;">{}</p>
+                    </div>
+                    """.format(response), unsafe_allow_html=True)
+                except Exception as e:
+                    st.error(f"Analysis failed: {e}")
+        
+        # Custom AI Analysis
+        st.subheader("Custom Analysis")
+        custom_question = st.text_area(
+            "Ask a specific question about your health data:",
+            placeholder="e.g., How does my sleep quality correlate with my readiness scores?",
+            height=100
+        )
+        
+        if st.button("Analyze", key="custom_analyze", type="primary", use_container_width=True) and custom_question:
+            try:
+                response = ask_ai(custom_question)
+                st.markdown("""
+                <div class="chart-container">
+                    <h4>Custom Analysis Result</h4>
+                    <p style="color: #000000;">{}</p>
+                </div>
+                """.format(response), unsafe_allow_html=True)
+            except Exception as e:
+                st.error(f"Custom analysis failed: {e}")
+        
+        # Recovery Score Trend
+        st.subheader("Recovery Score Trend")
+        if readiness_data is not None and len(readiness_data) > 0:
+            # Convert list of dataclass objects to DataFrame
+            readiness_df = pd.DataFrame([{
+                'day': item.day,
+                'score': getattr(item, 'score', None)
+            } for item in readiness_data])
+            
+            if 'score' in readiness_df.columns:
+                df = readiness_df.copy()
+                df['date'] = pd.to_datetime(df['day'])
+                df = df.sort_values('date')
+                
+                fig = px.line(
+                    df, x='date', y='score',
+                    title="Recovery Score Over Time",
+                    labels={'score': 'Recovery Score', 'date': 'Date'}
+                )
+                
+                fig.update_layout(
+                    height=400,
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)'
+                )
+                
+                st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("Please sync your data to view health trends.")
+    
+    with tab2:
         st.header("Health Dashboard")
         
         # Clean feature highlights without emojis
@@ -751,121 +867,7 @@ def main():
         else:
             st.info("Please sync your data to view health trends.")
     
-    with tab4:
-        st.header("AI-Powered Insights")
-        
-        # AI Analysis Section
-        st.markdown("""
-        <div class="feature-highlight">
-            <h4>AI Health Analysis</h4>
-            <p>Get personalized insights and recommendations based on your health data patterns.</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Pre-defined AI questions for quick insights
-        st.subheader("Quick Insights")
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            if st.button("Sleep Quality Analysis", use_container_width=True):
-                try:
-                    response = ask_ai("Analyze my sleep quality trends and provide recommendations for improvement.")
-                    st.markdown("""
-                    <div class="chart-container">
-                        <h4>Sleep Quality Analysis</h4>
-                        <p>{}</p>
-                    </div>
-                    """.format(response), unsafe_allow_html=True)
-                except Exception as e:
-                    st.error(f"Analysis failed: {e}")
-            
-            if st.button("Recovery Insights", use_container_width=True):
-                try:
-                    response = ask_ai("What are my recovery patterns and how can I optimize them?")
-                    st.markdown("""
-                    <div class="chart-container">
-                        <h4>Recovery Insights</h4>
-                        <p>{}</p>
-                    </div>
-                    """.format(response), unsafe_allow_html=True)
-                except Exception as e:
-                    st.error(f"Analysis failed: {e}")
-        
-        with col2:
-            if st.button("Activity Optimization", use_container_width=True):
-                try:
-                    response = ask_ai("How can I optimize my daily activity and exercise routine?")
-                    st.markdown("""
-                    <div class="chart-container">
-                        <h4>Activity Optimization</h4>
-                        <p>{}</p>
-                    </div>
-                    """.format(response), unsafe_allow_html=True)
-                except Exception as e:
-                    st.error(f"Analysis failed: {e}")
-            
-            if st.button("Personalized Goals", use_container_width=True):
-                try:
-                    response = ask_ai("Based on my health data, what are some personalized health goals I should set?")
-                    st.markdown("""
-                    <div class="chart-container">
-                        <h4>Personalized Goals</h4>
-                        <p>{}</p>
-                    </div>
-                    """.format(response), unsafe_allow_html=True)
-                except Exception as e:
-                    st.error(f"Analysis failed: {e}")
-        
-        # Custom AI Analysis
-        st.subheader("Custom Analysis")
-        custom_question = st.text_area(
-            "Ask a specific question about your health data:",
-            placeholder="e.g., How does my sleep quality correlate with my readiness scores?",
-            height=100
-        )
-        
-        if st.button("Analyze", type="primary", use_container_width=True) and custom_question:
-            try:
-                response = ask_ai(custom_question)
-                st.markdown("""
-                <div class="chart-container">
-                    <h4>Custom Analysis Result</h4>
-                    <p>{}</p>
-                </div>
-                """.format(response), unsafe_allow_html=True)
-            except Exception as e:
-                st.error(f"Custom analysis failed: {e}")
-            
-            # Recovery Score Trend
-            st.subheader("Recovery Score Trend")
-            if readiness_data is not None and len(readiness_data) > 0:
-                # Convert list of dataclass objects to DataFrame
-                readiness_df = pd.DataFrame([{
-                    'day': item.day,
-                    'score': getattr(item, 'score', None)
-                } for item in readiness_data])
-                
-                if 'score' in readiness_df.columns:
-                    df = readiness_df.copy()
-                    df['date'] = pd.to_datetime(df['day'])
-                    df = df.sort_values('date')
-                    
-                    fig = px.line(
-                        df, x='date', y='score',
-                        title="Recovery Score Over Time",
-                        labels={'score': 'Recovery Score', 'date': 'Date'}
-                    )
-                    
-                    fig.update_layout(
-                        height=400,
-                        plot_bgcolor='rgba(0,0,0,0)',
-                        paper_bgcolor='rgba(0,0,0,0)'
-                    )
-                    
-                    st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("📈 Please sync your data to view health trends.")
+
 
 if __name__ == "__main__":
     main()
