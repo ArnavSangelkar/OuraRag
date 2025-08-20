@@ -7,7 +7,7 @@ from typing import Any, Dict, Iterable, List, Optional
 import httpx
 from pydantic import BaseModel
 
-OURA_BASE_URL = "https://api.ouraring.com/v2"
+OURA_BASE_URL = "https://api.ouraring.com"
 
 class SleepSummary(BaseModel):
     day: date
