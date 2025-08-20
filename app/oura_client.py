@@ -38,6 +38,19 @@ class ActivitySummary(BaseModel):
     total_calories: Optional[int] = None
     average_met: Optional[float] = None
 
+class SpO2Summary(BaseModel):
+    day: date
+    average_spo2: Optional[float] = None
+    lowest_spo2: Optional[float] = None
+    spo2_drops: Optional[int] = None
+
+class HeartRateSummary(BaseModel):
+    day: date
+    average_heart_rate: Optional[float] = None
+    resting_heart_rate: Optional[float] = None
+    max_heart_rate: Optional[float] = None
+    min_heart_rate: Optional[float] = None
+
 class OuraClient:
     def __init__(self, access_token: str, timeout_seconds: float = 30.0) -> None:
         self._access_token = access_token
@@ -75,7 +88,7 @@ class OuraClient:
 
     def fetch_sleep(self, start_date: date, end_date: date) -> List[SleepSummary]:
         raw = self._paginate(
-            "/usercollection/sleep", start_date, end_date, items_key="data"
+            "/v2/usercollection/daily_sleep", start_date, end_date, items_key="data"
         )
         parsed: List[SleepSummary] = []
         for item in raw:
@@ -102,7 +115,7 @@ class OuraClient:
 
     def fetch_readiness(self, start_date: date, end_date: date) -> List[ReadinessSummary]:
         raw = self._paginate(
-            "/usercollection/daily_readiness", start_date, end_date, items_key="data"
+            "/v2/usercollection/daily_readiness", start_date, end_date, items_key="data"
         )
         parsed: List[ReadinessSummary] = []
         for item in raw:
@@ -120,7 +133,7 @@ class OuraClient:
 
     def fetch_activity(self, start_date: date, end_date: date) -> List[ActivitySummary]:
         raw = self._paginate(
-            "/usercollection/daily_activity", start_date, end_date, items_key="data"
+            "/v2/usercollection/daily_activity", start_date, end_date, items_key="data"
         )
         parsed: List[ActivitySummary] = []
         for item in raw:
@@ -132,6 +145,41 @@ class OuraClient:
                     active_calories=item.get("active_calories"),
                     total_calories=item.get("total_calories"),
                     average_met=item.get("average_met"),
+                )
+            )
+        return parsed
+
+    def fetch_spo2(self, start_date: date, end_date: date) -> List[SpO2Summary]:
+        """Fetch SpO2 (blood oxygen) data"""
+        raw = self._paginate(
+            "/v2/usercollection/daily_spo2", start_date, end_date, items_key="data"
+        )
+        parsed: List[SpO2Summary] = []
+        for item in raw:
+            parsed.append(
+                SpO2Summary(
+                    day=date.fromisoformat(item["day"]),
+                    average_spo2=extract_numeric_value(item.get("average_spo2") or item.get("spo2_average")),
+                    lowest_spo2=extract_numeric_value(item.get("lowest_spo2") or item.get("spo2_min")),
+                    spo2_drops=item.get("spo2_drops") or item.get("drops_count"),
+                )
+            )
+        return parsed
+
+    def fetch_heart_rate(self, start_date: date, end_date: date) -> List[HeartRateSummary]:
+        """Fetch heart rate data"""
+        raw = self._paginate(
+            "/v2/usercollection/heart_rate", start_date, end_date, items_key="data"
+        )
+        parsed: List[HeartRateSummary] = []
+        for item in raw:
+            parsed.append(
+                HeartRateSummary(
+                    day=date.fromisoformat(item["day"]),
+                    average_heart_rate=extract_numeric_value(item.get("average_heart_rate") or item.get("heart_rate_average")),
+                    resting_heart_rate=extract_numeric_value(item.get("resting_heart_rate") or item.get("rest_heart_rate")),
+                    max_heart_rate=extract_numeric_value(item.get("max_heart_rate") or item.get("heart_rate_max")),
+                    min_heart_rate=extract_numeric_value(item.get("min_heart_rate") or item.get("heart_rate_min")),
                 )
             )
         return parsed
