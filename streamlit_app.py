@@ -53,6 +53,22 @@ st.markdown("""
         padding: 2rem;
     }
     
+    /* Ensure all Streamlit headers and text are black */
+    h1, h2, h3, h4, h5, h6 {
+        color: #000000 !important;
+    }
+    
+    /* Override Streamlit's default header colors */
+    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, 
+    .stMarkdown h4, .stMarkdown h5, .stMarkdown h6 {
+        color: #000000 !important;
+    }
+    
+    /* Ensure all text in the app is black */
+    .stMarkdown p, .stMarkdown div, .stMarkdown span {
+        color: #000000 !important;
+    }
+    
     /* Header styling with black text */
     .main-header {
         font-size: 3.5rem;
@@ -664,7 +680,7 @@ def main():
                 response = ask_ai(custom_question)
                 st.markdown("""
                 <div class="chart-container">
-                    <h4>Custom Analysis Result</h4>
+                    <h4 style="color: #000000;">Custom Analysis Result</h4>
                     <p style="color: #000000;">{}</p>
                 </div>
                 """.format(response), unsafe_allow_html=True)
