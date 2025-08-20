@@ -33,10 +33,20 @@ class ReadinessSummary(BaseModel):
 class ActivitySummary(BaseModel):
     day: date
     steps: Optional[int] = None
-    inactive_time: Optional[int] = None
+    activity_score: Optional[int] = None
+    calories: Optional[int] = None
     active_calories: Optional[int] = None
     total_calories: Optional[int] = None
+    inactive_time: Optional[int] = None
+    active_time: Optional[int] = None
     average_met: Optional[float] = None
+    target_calories: Optional[int] = None
+    target_meters: Optional[int] = None
+    meters_to_target: Optional[int] = None
+    resting_time: Optional[int] = None
+    sedentary_time: Optional[int] = None
+    sedentary_met_minutes: Optional[int] = None
+    non_wear_time: Optional[int] = None
 
 class SpO2Summary(BaseModel):
     day: date
@@ -102,9 +112,6 @@ class OuraClient:
         
         parsed: List[SleepSummary] = []
         for item in sleep_sessions:
-            # Debug: Print raw sleep data to see what's available
-            print(f"🔍 Raw sleep data: {item.keys()}")
-            
             # Get the score for this day
             day_score = score_map.get(item["day"])
             
@@ -132,9 +139,6 @@ class OuraClient:
         )
         parsed: List[ReadinessSummary] = []
         for item in raw:
-            # Debug: Print raw readiness data to see what's available
-            print(f"🔍 Raw readiness data: {item.keys()}")
-            
             parsed.append(ReadinessSummary(
                 day=date.fromisoformat(item["day"]), 
                 score=item.get("score") or item.get("readiness_score"),
@@ -145,19 +149,34 @@ class OuraClient:
         return parsed
 
     def fetch_activity(self, start_date: date, end_date: date) -> List[ActivitySummary]:
-        raw = self._paginate(
+        # Get activity data from daily activity endpoint (this one works)
+        daily_activity = self._paginate(
             "/v2/usercollection/daily_activity", start_date, end_date, items_key="data"
         )
+        
+        # Try to get additional activity data from other endpoints if available
+        # Note: /usercollection/activity returns 404, so we'll use what's available
+        
         parsed: List[ActivitySummary] = []
-        for item in raw:
+        for item in daily_activity:
             parsed.append(
                 ActivitySummary(
                     day=date.fromisoformat(item["day"]),
                     steps=item.get("steps"),
-                    inactive_time=item.get("inactive_time"),
+                    activity_score=item.get("score"),  # Daily activity might have a score
+                    calories=item.get("calories") or item.get("total_calories"),
                     active_calories=item.get("active_calories"),
                     total_calories=item.get("total_calories"),
+                    inactive_time=item.get("inactive_time"),
+                    active_time=item.get("active_time"),
                     average_met=item.get("average_met"),
+                    target_calories=item.get("target_calories"),
+                    target_meters=item.get("target_meters"),
+                    meters_to_target=item.get("meters_to_target"),
+                    resting_time=item.get("resting_time"),
+                    sedentary_time=item.get("sedentary_time"),
+                    sedentary_met_minutes=item.get("sedentary_met_minutes"),
+                    non_wear_time=item.get("non_wear_time"),
                 )
             )
         return parsed
