@@ -491,8 +491,8 @@ def display_metrics(sleep_data, readiness_data, activity_data):
 def main():
     """Main application function"""
     # Header
-    st.markdown('<h1 class="main-header">💍 Oura Health Analytics</h1>', unsafe_allow_html=True)
-    st.markdown('<p class="sub-header">AI-Powered Insights from Your Sleep & Health Data</p>', unsafe_allow_html=True)
+    st.markdown('<h1 class="main-header">Oura Health Analytics</h1>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-header" style="color: white;">AI-Powered Insights from Your Sleep & Health Data</p>', unsafe_allow_html=True)
     
     # Clean Sidebar without emojis
     with st.sidebar:
@@ -607,7 +607,7 @@ def main():
                     response = ask_ai("Analyze my sleep quality trends and provide recommendations for improvement.")
                     st.markdown("""
                     <div class="chart-container">
-                        <h4>Sleep Quality Analysis</h4>
+                        <h4 style="color: #000000;">Sleep Quality Analysis</h4>
                         <p style="color: #000000;">{}</p>
                     </div>
                     """.format(response), unsafe_allow_html=True)
