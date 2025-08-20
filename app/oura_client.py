@@ -87,19 +87,32 @@ class OuraClient:
         return items
 
     def fetch_sleep(self, start_date: date, end_date: date) -> List[SleepSummary]:
-        raw = self._paginate(
+        # Get detailed sleep data from sleep sessions endpoint
+        sleep_sessions = self._paginate(
+            "/v2/usercollection/sleep", start_date, end_date, items_key="data"
+        )
+        
+        # Get sleep scores from daily sleep endpoint
+        daily_sleep = self._paginate(
             "/v2/usercollection/daily_sleep", start_date, end_date, items_key="data"
         )
+        
+        # Create a mapping of day -> score for easy lookup
+        score_map = {item["day"]: item.get("score") for item in daily_sleep}
+        
         parsed: List[SleepSummary] = []
-        for item in raw:
+        for item in sleep_sessions:
             # Debug: Print raw sleep data to see what's available
             print(f"🔍 Raw sleep data: {item.keys()}")
+            
+            # Get the score for this day
+            day_score = score_map.get(item["day"])
             
             parsed.append(
                 SleepSummary(
                     day=date.fromisoformat(item["day"]),
                     total_sleep_duration=item.get("total_sleep_duration", 0),
-                    score=item.get("score") or item.get("sleep_score") or item.get("overall_score"),
+                    score=day_score,  # Use score from daily sleep endpoint
                     efficiency=item.get("efficiency") or item.get("sleep_efficiency"),
                     latency=item.get("latency") or item.get("sleep_latency"),
                     deep_sleep_duration=item.get("deep_sleep_duration") or item.get("deep_sleep"),
