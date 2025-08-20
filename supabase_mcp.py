@@ -7,7 +7,7 @@ This allows AI models to interact with your Supabase database with comprehensive
 import json
 import os
 from typing import Any, Dict, List, Optional
-from datetime import date, datetime
+from datetime import date, timedelta, datetime
 from supabase import create_client, Client
 from dotenv import load_dotenv
 
@@ -21,12 +21,36 @@ class SupabaseMCP:
             raise ValueError("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set")
         
         self.supabase: Client = create_client(url, key)
+        # For development, get any existing user ID from the database
+        self._cached_user_id = None
     
-    def get_health_summary(self, user_id: str, days: int = 30) -> Dict[str, Any]:
+    def _get_user_id(self, user_id: Optional[str] = None) -> str:
+        """Get user ID, finding any existing user in the database if none provided"""
+        if user_id:
+            return user_id
+        
+        # Cache the user ID to avoid repeated queries
+        if self._cached_user_id:
+            return self._cached_user_id
+            
+        # Find any existing user ID from the database
+        try:
+            response = self.supabase.table("health_data").select("user_id").limit(1).execute()
+            if response.data:
+                self._cached_user_id = response.data[0]["user_id"]
+                return self._cached_user_id
+        except Exception:
+            pass
+            
+        # Fallback to default UUID format
+        return "default-user"
+    
+    def get_health_summary(self, user_id: Optional[str] = None, days: int = 30) -> Dict[str, Any]:
         """Get comprehensive health summary for a user"""
         try:
+            user_id = self._get_user_id(user_id)
             end_date = date.today()
-            start_date = end_date.replace(day=end_date.day - days)
+            start_date = end_date - timedelta(days=days)
             
             # Get all health data
             response = self.supabase.table("health_data").select("*").eq(
@@ -54,58 +78,71 @@ class SupabaseMCP:
             # Enhanced sleep analysis with new fields
             if sleep_data:
                 # Basic metrics
-                sleep_durations = [d["data"].get("total_sleep_duration", 0) for d in sleep_data]
-                summary["avg_sleep_duration"] = sum(sleep_durations) / len(sleep_durations)
-                summary["avg_sleep_duration_hours"] = summary["avg_sleep_duration"] / 3600
+                sleep_durations = [d["data"].get("total_sleep_duration", 0) for d in sleep_data if d["data"].get("total_sleep_duration") is not None and d["data"].get("total_sleep_duration") > 0]
+                if sleep_durations:
+                    summary["avg_sleep_duration"] = sum(sleep_durations) / len(sleep_durations)
+                    summary["avg_sleep_duration_hours"] = summary["avg_sleep_duration"] / 3600
                 
                 # Sleep quality metrics
-                efficiencies = [d["data"].get("efficiency", 0) for d in sleep_data if d["data"].get("efficiency")]
+                efficiencies = [d["data"].get("efficiency", 0) for d in sleep_data if d["data"].get("efficiency") is not None and d["data"].get("efficiency") > 0]
                 if efficiencies:
                     summary["avg_sleep_efficiency"] = sum(efficiencies) / len(efficiencies)
                 
                 # Sleep stage analysis
-                deep_sleep = [d["data"].get("deep_sleep_duration", 0) for d in sleep_data]
-                rem_sleep = [d["data"].get("rem_sleep_duration", 0) for d in sleep_data]
-                light_sleep = [d["data"].get("light_sleep_duration", 0) for d in sleep_data]
+                deep_sleep = [d["data"].get("deep_sleep_duration", 0) for d in sleep_data if d["data"].get("deep_sleep_duration") is not None and d["data"].get("deep_sleep_duration") >= 0]
+                rem_sleep = [d["data"].get("rem_sleep_duration", 0) for d in sleep_data if d["data"].get("rem_sleep_duration") is not None and d["data"].get("rem_sleep_duration") >= 0]
+                light_sleep = [d["data"].get("light_sleep_duration", 0) for d in sleep_data if d["data"].get("light_sleep_duration") is not None and d["data"].get("light_sleep_duration") >= 0]
                 
-                summary["avg_deep_sleep_hours"] = sum(deep_sleep) / len(deep_sleep) / 3600
-                summary["avg_rem_sleep_hours"] = sum(rem_sleep) / len(rem_sleep) / 3600
-                summary["avg_light_sleep_hours"] = sum(light_sleep) / len(light_sleep) / 3600
+                if deep_sleep:
+                    summary["avg_deep_sleep_hours"] = sum(deep_sleep) / len(deep_sleep) / 3600
+                if rem_sleep:
+                    summary["avg_rem_sleep_hours"] = sum(rem_sleep) / len(rem_sleep) / 3600
+                if light_sleep:
+                    summary["avg_light_sleep_hours"] = sum(light_sleep) / len(light_sleep) / 3600
                 
                 # Sleep scores
-                sleep_scores = [d["data"].get("score", 0) for d in sleep_data if d["data"].get("score")]
+                sleep_scores = [d["data"].get("score", 0) for d in sleep_data if d["data"].get("score") is not None and d["data"].get("score") > 0]
                 if sleep_scores:
                     summary["avg_sleep_score"] = sum(sleep_scores) / len(sleep_scores)
                 
                 # Latency analysis
-                latencies = [d["data"].get("latency", 0) for d in sleep_data if d["data"].get("latency")]
+                latencies = [d["data"].get("latency", 0) for d in sleep_data if d["data"].get("latency") is not None and d["data"].get("latency") >= 0]
                 if latencies:
                     summary["avg_sleep_latency_minutes"] = sum(latencies) / len(latencies) / 60
             
             # Enhanced readiness analysis
             if readiness_data:
-                readiness_scores = [d["data"].get("score", 0) for d in readiness_data if d["data"].get("score")]
+                readiness_scores = [d["data"].get("score", 0) for d in readiness_data if d["data"].get("score") is not None and d["data"].get("score") > 0]
                 if readiness_scores:
                     summary["avg_readiness_score"] = sum(readiness_scores) / len(readiness_scores)
                 
                 # Temperature analysis
-                temp_deviations = [d["data"].get("temperature_deviation", 0) for d in readiness_data if d["data"].get("temperature_deviation")]
+                temp_deviations = [d["data"].get("temperature_deviation", 0) for d in readiness_data if d["data"].get("temperature_deviation") is not None]
                 if temp_deviations:
                     summary["avg_temperature_deviation"] = sum(temp_deviations) / len(temp_deviations)
             
             # Enhanced activity analysis with new fields
             if activity_data:
                 # Basic metrics
-                steps = [d["data"].get("steps", 0) for d in activity_data if d["data"].get("steps")]
+                steps = [d["data"].get("steps", 0) for d in activity_data if d["data"].get("steps") is not None and d["data"].get("steps") > 0]
                 if steps:
                     summary["avg_steps"] = sum(steps) / len(steps)
                     summary["total_steps"] = sum(steps)
                     summary["max_steps"] = max(steps)
                     summary["min_steps"] = min(steps)
                 
-                # Calorie analysis
-                total_calories = [d["data"].get("total_calories", 0) for d in activity_data if d["data"].get("total_calories")]
-                active_calories = [d["data"].get("active_calories", 0) for d in activity_data if d["data"].get("active_calories")]
+                # Calorie analysis (use 'calories' or 'total_calories' field)
+                total_calories = []
+                for d in activity_data:
+                    cal_val = d["data"].get("calories") or d["data"].get("total_calories")
+                    if cal_val is not None and cal_val > 0:
+                        total_calories.append(cal_val)
+                
+                active_calories = []
+                for d in activity_data:
+                    active_cal = d["data"].get("active_calories")
+                    if active_cal is not None and active_cal > 0:
+                        active_calories.append(active_cal)
                 
                 if total_calories:
                     summary["avg_total_calories"] = sum(total_calories) / len(total_calories)
@@ -113,18 +150,18 @@ class SupabaseMCP:
                     summary["avg_active_calories"] = sum(active_calories) / len(active_calories)
                 
                 # Activity scores
-                activity_scores = [d["data"].get("activity_score", 0) for d in activity_data if d["data"].get("activity_score")]
+                activity_scores = [d["data"].get("activity_score", 0) for d in activity_data if d["data"].get("activity_score") is not None and d["data"].get("activity_score") > 0]
                 if activity_scores:
                     summary["avg_activity_score"] = sum(activity_scores) / len(activity_scores)
                 
                 # Goal tracking
-                target_calories = [d["data"].get("target_calories", 0) for d in activity_data if d["data"].get("target_calories")]
+                target_calories = [d["data"].get("target_calories", 0) for d in activity_data if d["data"].get("target_calories") is not None and d["data"].get("target_calories") > 0]
                 if target_calories:
                     summary["avg_target_calories"] = sum(target_calories) / len(target_calories)
                 
                 # Time analysis
-                resting_times = [d["data"].get("resting_time", 0) for d in activity_data if d["data"].get("resting_time")]
-                sedentary_times = [d["data"].get("sedentary_time", 0) for d in activity_data if d["data"].get("sedentary_time")]
+                resting_times = [d["data"].get("resting_time", 0) for d in activity_data if d["data"].get("resting_time") is not None and d["data"].get("resting_time") > 0]
+                sedentary_times = [d["data"].get("sedentary_time", 0) for d in activity_data if d["data"].get("sedentary_time") is not None and d["data"].get("sedentary_time") > 0]
                 
                 if resting_times:
                     summary["avg_resting_time_hours"] = sum(resting_times) / len(resting_times) / 3600
@@ -150,12 +187,13 @@ class SupabaseMCP:
         except Exception as e:
             return [{"error": str(e)}]
     
-    def get_user_insights(self, user_id: str) -> Dict[str, Any]:
+    def get_user_insights(self, user_id: Optional[str] = None) -> Dict[str, Any]:
         """Generate comprehensive insights for a user using enhanced data"""
         try:
+            user_id = self._get_user_id(user_id)
             # Get recent data
             end_date = date.today()
-            start_date = end_date.replace(day=end_date.day - 7)
+            start_date = end_date - timedelta(days=7)
             
             response = self.supabase.table("health_data").select("*").eq(
                 "user_id", user_id
@@ -394,9 +432,10 @@ class SupabaseMCP:
         except Exception as e:
             return {"error": str(e)}
     
-    def get_data_quality_report(self, user_id: str) -> Dict[str, Any]:
+    def get_data_quality_report(self, user_id: Optional[str] = None) -> Dict[str, Any]:
         """Generate comprehensive data quality report"""
         try:
+            user_id = self._get_user_id(user_id)
             # Get all user data
             response = self.supabase.table("health_data").select("*").eq("user_id", user_id).execute()
             data = response.data
@@ -445,11 +484,12 @@ class SupabaseMCP:
         except Exception as e:
             return {"error": str(e)}
     
-    def get_sleep_analysis(self, user_id: str, days: int = 30) -> Dict[str, Any]:
+    def get_sleep_analysis(self, user_id: Optional[str] = None, days: int = 30) -> Dict[str, Any]:
         """Get detailed sleep analysis using enhanced data"""
         try:
+            user_id = self._get_user_id(user_id)
             end_date = date.today()
-            start_date = end_date.replace(day=end_date.day - days)
+            start_date = end_date - timedelta(days=days)
             
             response = self.supabase.table("health_data").select("*").eq(
                 "user_id", user_id
@@ -511,11 +551,12 @@ class SupabaseMCP:
         except Exception as e:
             return {"error": str(e)}
     
-    def get_activity_analysis(self, user_id: str, days: int = 30) -> Dict[str, Any]:
+    def get_activity_analysis(self, user_id: Optional[str] = None, days: int = 30) -> Dict[str, Any]:
         """Get detailed activity analysis using enhanced data"""
         try:
+            user_id = self._get_user_id(user_id)
             end_date = date.today()
-            start_date = end_date.replace(day=end_date.day - days)
+            start_date = end_date - timedelta(days=days)
             
             response = self.supabase.table("health_data").select("*").eq(
                 "user_id", user_id

@@ -11,11 +11,18 @@ load_dotenv()
 class SupabaseClient:
     def __init__(self):
         url = os.getenv("SUPABASE_URL")
-        key = os.getenv("SUPABASE_ANON_KEY")
+        # Use service role key to bypass RLS policies
+        key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_ANON_KEY")
         if not url or not key:
-            raise ValueError("SUPABASE_URL and SUPABASE_ANON_KEY must be set")
+            raise ValueError("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_ANON_KEY) must be set")
         
         self.supabase: Client = create_client(url, key)
+        self.using_service_role = bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY"))
+        
+        if self.using_service_role:
+            print("🔑 Using Supabase service role (RLS bypassed)")
+        else:
+            print("⚠️ Using Supabase anon key (RLS enforced)")
     
     def get_user_id(self) -> Optional[str]:
         """Get current user ID from Supabase auth"""
@@ -32,6 +39,21 @@ class SupabaseClient:
             if not user_id:
                 return False
             
+            self.supabase.table("health_data").insert({
+                "user_id": user_id,
+                "data_type": data_type,
+                "day": day.isoformat(),
+                "data": data
+            }).execute()
+            return True
+        except Exception as e:
+            print(f"Error storing health data: {e}")
+            return False
+    
+    def store_health_data_no_auth(self, data_type: str, day: date, data: Dict[str, Any], user_id: str = "default-user") -> bool:
+        """Store health data in Supabase without authentication (for development)"""
+        try:
+            # Use the service role client directly to bypass RLS
             self.supabase.table("health_data").insert({
                 "user_id": user_id,
                 "data_type": data_type,
