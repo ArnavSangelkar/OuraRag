@@ -715,14 +715,6 @@ def main():
     with tab1:
         st.header("AI-Powered Insights")
         
-        # AI Analysis Section
-        st.markdown("""
-        <div class="feature-highlight">
-            <h4>AI Health Analysis</h4>
-            <p>Get personalized insights and recommendations based on your health data patterns.</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
         # Pre-defined AI questions for quick insights
         st.subheader("Quick Insights")
         
