@@ -53,34 +53,34 @@ st.markdown("""
         padding: 2rem;
     }
     
-    /* Ensure all Streamlit headers and text are black */
+    /* Ensure all Streamlit headers and text are white */
     h1, h2, h3, h4, h5, h6 {
-        color: #000000 !important;
+        color: #ffffff !important;
     }
     
     /* Override Streamlit's default header colors */
     .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, 
     .stMarkdown h4, .stMarkdown h5, .stMarkdown h6 {
-        color: #000000 !important;
+        color: #ffffff !important;
     }
     
-    /* Ensure all text in the app is black */
+    /* Ensure all text in the app is white */
     .stMarkdown p, .stMarkdown div, .stMarkdown span {
-        color: #000000 !important;
+        color: #ffffff !important;
     }
     
-    /* Header styling with black text */
+    /* Header styling with white text */
     .main-header {
         font-size: 3.5rem;
         font-weight: 800;
-        color: #000000;
+        color: #ffffff;
         text-align: center;
         margin-bottom: 2rem;
     }
     
     .sub-header {
         font-size: 1.5rem;
-        color: #000000;
+        color: #ffffff;
         text-align: center;
         margin-bottom: 3rem;
         font-weight: 300;
@@ -253,10 +253,10 @@ st.markdown("""
     .loading-container {
         text-align: center;
         padding: 3rem;
-        color: #000000;
+        color: #ffffff;
     }
     
-    /* Feature highlights with black text */
+    /* Feature highlights with white text */
     .feature-highlight {
         background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
         border: 1px solid #0ea5e9;
@@ -266,13 +266,13 @@ st.markdown("""
     }
     
     .feature-highlight h4 {
-        color: #000000;
+        color: #ffffff;
         margin-bottom: 0.5rem;
         font-weight: 600;
     }
     
     .feature-highlight p {
-        color: #000000;
+        color: #ffffff;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -440,6 +440,87 @@ def create_hrv_chart(readiness_data):
     
     return fig
 
+def create_sleep_score_chart(sleep_data):
+    """Create a chart for sleep score trends."""
+    if not sleep_data or len(sleep_data) == 0:
+        return None
+    
+    df = pd.DataFrame([{
+        'day': item.day,
+        'score': getattr(item, 'score', None)
+    } for item in sleep_data])
+    
+    df['date'] = pd.to_datetime(df['day'])
+    df = df.sort_values('date')
+    
+    fig = px.line(
+        df, x='date', y='score',
+        title="Sleep Score Over Time",
+        labels={'score': 'Sleep Score', 'date': 'Date'}
+    )
+    
+    fig.update_layout(
+        height=400,
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)'
+    )
+    
+    return fig
+
+def create_readiness_score_chart(readiness_data):
+    """Create a chart for readiness score trends."""
+    if not readiness_data or len(readiness_data) == 0:
+        return None
+    
+    df = pd.DataFrame([{
+        'day': item.day,
+        'score': getattr(item, 'score', None)
+    } for item in readiness_data])
+    
+    df['date'] = pd.to_datetime(df['day'])
+    df = df.sort_values('date')
+    
+    fig = px.line(
+        df, x='date', y='score',
+        title="Readiness Score Over Time",
+        labels={'score': 'Readiness Score', 'date': 'Date'}
+    )
+    
+    fig.update_layout(
+        height=400,
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)'
+    )
+    
+    return fig
+
+def create_activity_score_chart(activity_data):
+    """Create a chart for activity score trends."""
+    if not activity_data or len(activity_data) == 0:
+        return None
+    
+    df = pd.DataFrame([{
+        'day': item.day,
+        'score': getattr(item, 'score', None)
+    } for item in activity_data])
+    
+    df['date'] = pd.to_datetime(df['day'])
+    df = df.sort_values('date')
+    
+    fig = px.line(
+        df, x='date', y='score',
+        title="Activity Score Over Time",
+        labels={'score': 'Activity Score', 'date': 'Date'}
+    )
+    
+    fig.update_layout(
+        height=400,
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)'
+    )
+    
+    return fig
+
 def display_metrics(sleep_data, readiness_data, activity_data):
     """Display key metrics in an attractive grid"""
     if not sleep_data or not readiness_data or not activity_data:
@@ -598,8 +679,8 @@ def main():
             st.error("API Keys Missing")
             st.stop()
     
-    # Main content area with AI Insights as first tab
-    tab1, tab2, tab3, tab4 = st.tabs(["AI Insights", "Dashboard", "Analytics", "Trends"])
+    # Main content area with AI Insights and Dashboard only
+    tab1, tab2 = st.tabs(["AI Insights", "Dashboard"])
     
     with tab1:
         st.header("AI-Powered Insights")
@@ -623,8 +704,8 @@ def main():
                     response = ask_ai("Analyze my sleep quality trends and provide recommendations for improvement.")
                     st.markdown("""
                     <div class="chart-container">
-                        <h4 style="color: #000000;">Sleep Quality Analysis</h4>
-                        <p style="color: #000000;">{}</p>
+                        <h4 style="color: #ffffff;">Sleep Quality Analysis</h4>
+                        <p style="color: #ffffff;">{}</p>
                     </div>
                     """.format(response), unsafe_allow_html=True)
                 except Exception as e:
@@ -636,7 +717,7 @@ def main():
                     st.markdown("""
                     <div class="chart-container">
                         <h4>Recovery Insights</h4>
-                        <p style="color: #000000;">{}</p>
+                        <p style="color: #ffffff;">{}</p>
                     </div>
                     """.format(response), unsafe_allow_html=True)
                 except Exception as e:
@@ -649,7 +730,7 @@ def main():
                     st.markdown("""
                     <div class="chart-container">
                         <h4>Activity Optimization</h4>
-                        <p style="color: #000000;">{}</p>
+                        <p style="color: #ffffff;">{}</p>
                     </div>
                     """.format(response), unsafe_allow_html=True)
                 except Exception as e:
@@ -661,11 +742,11 @@ def main():
                     st.markdown("""
                     <div class="chart-container">
                         <h4>Personalized Goals</h4>
-                        <p style="color: #000000;">{}</p>
+                        <p style="color: #ffffff;">{}</p>
                     </div>
                     """.format(response), unsafe_allow_html=True)
                 except Exception as e:
-                    st.error(f"Analysis failed: {e}")
+                    st.error(f"Custom analysis failed: {e}")
         
         # Custom AI Analysis
         st.subheader("Custom Analysis")
@@ -680,42 +761,12 @@ def main():
                 response = ask_ai(custom_question)
                 st.markdown("""
                 <div class="chart-container">
-                    <h4 style="color: #000000;">Custom Analysis Result</h4>
-                    <p style="color: #000000;">{}</p>
+                    <h4 style="color: #ffffff;">Custom Analysis Result</h4>
+                    <p style="color: #ffffff;">{}</p>
                 </div>
                 """.format(response), unsafe_allow_html=True)
             except Exception as e:
                 st.error(f"Custom analysis failed: {e}")
-        
-        # Recovery Score Trend
-        st.subheader("Recovery Score Trend")
-        if readiness_data is not None and len(readiness_data) > 0:
-            # Convert list of dataclass objects to DataFrame
-            readiness_df = pd.DataFrame([{
-                'day': item.day,
-                'score': getattr(item, 'score', None)
-            } for item in readiness_data])
-            
-            if 'score' in readiness_df.columns:
-                df = readiness_df.copy()
-                df['date'] = pd.to_datetime(df['day'])
-                df = df.sort_values('date')
-                
-                fig = px.line(
-                    df, x='date', y='score',
-                    title="Recovery Score Over Time",
-                    labels={'score': 'Recovery Score', 'date': 'Date'}
-                )
-                
-                fig.update_layout(
-                    height=400,
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    paper_bgcolor='rgba(0,0,0,0)'
-                )
-                
-                st.plotly_chart(fig, use_container_width=True)
-        else:
-            st.info("Please sync your data to view health trends.")
     
     with tab2:
         st.header("Health Dashboard")
@@ -762,12 +813,31 @@ def main():
             display_metrics(sleep_data, readiness_data, activity_data)
             st.markdown('</div>', unsafe_allow_html=True)
             
-            # Clean sleep chart without emojis
-            st.subheader("Sleep Analytics")
+            # Create three main score charts
+            st.subheader("Health Score Trends")
+            
+            # Sleep Score Chart
             st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-            sleep_chart = create_sleep_chart(sleep_data)
+            st.subheader("Sleep Score")
+            sleep_chart = create_sleep_score_chart(sleep_data)
             if sleep_chart:
                 st.plotly_chart(sleep_chart, use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            # Readiness Score Chart
+            st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+            st.subheader("Readiness Score")
+            readiness_chart = create_readiness_score_chart(readiness_data)
+            if readiness_chart:
+                st.plotly_chart(readiness_chart, use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            # Activity Score Chart
+            st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+            st.subheader("Activity Score")
+            activity_chart = create_activity_score_chart(activity_data)
+            if activity_chart:
+                st.plotly_chart(activity_chart, use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
         else:
             # Clean empty state without emojis
@@ -778,110 +848,6 @@ def main():
                 <p>Click the "Sync Data" button in the sidebar to get started.</p>
             </div>
             """, unsafe_allow_html=True)
-    
-    with tab2:
-        st.header("🔍 Detailed Analytics")
-        
-        if sleep_data is not None and len(sleep_data) > 0:
-            # Convert list of dataclass objects to DataFrame for analysis with 8-hour defaults
-            sleep_df = pd.DataFrame([{
-                'day': item.day,
-                'score': getattr(item, 'score', None),
-                'deep': getattr(item, 'deep_sleep_duration', 28800) or 28800,  # Default to 8 hours (28800 seconds)
-                'rem': getattr(item, 'rem_sleep_duration', 28800) or 28800,   # Default to 8 hours
-                'light': getattr(item, 'light_sleep_duration', 28800) or 28800, # Default to 8 hours
-                'efficiency': getattr(item, 'efficiency', 100) or 100,         # Default to 100%
-                'latency': getattr(item, 'latency', 0) or 0,                   # Default to 0
-                'awake': getattr(item, 'awake', 0) or 0,                       # Default to 0
-                'total_duration': getattr(item, 'total_sleep_duration', 28800) or 28800, # Default to 8 hours
-                'average_heart_rate': getattr(item, 'average_heart_rate', 60) or 60,      # Default to 60 bpm
-                'average_hrv': getattr(item, 'average_hrv', 30) or 30,                    # Default to 30ms
-                'resting_heart_rate': getattr(item, 'resting_heart_rate', 60) or 60,      # Default to 60 bpm
-                'average_breath': getattr(item, 'average_breath', 15) or 15               # Default to 15 bpm
-            } for item in sleep_data])
-            
-            # Sleep stages breakdown
-            st.subheader("🛏️ Sleep Stages Analysis")
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                if 'deep' in sleep_df.columns and 'rem' in sleep_df.columns:
-                    recent_sleep = sleep_df.iloc[-1]
-                    
-                    # Safe conversion with 8-hour defaults
-                    deep_sleep = (recent_sleep.get('deep', 28800) or 28800) / 3600  # Convert to hours
-                    rem_sleep = (recent_sleep.get('rem', 28800) or 28800) / 3600
-                    light_sleep = (recent_sleep.get('light', 28800) or 28800) / 3600
-                    
-                    # Always show chart since we have 8-hour defaults
-                    if True:
-                        fig = go.Figure(data=[go.Pie(
-                            labels=['Deep Sleep', 'REM Sleep', 'Light Sleep'],
-                            values=[deep_sleep, rem_sleep, light_sleep],
-                            hole=0.4,
-                            marker_colors=['#6366f1', '#8b5cf6', '#06b6d4']
-                        )])
-                        
-                        fig.update_layout(
-                            title="Sleep Stage Distribution",
-                            height=400,
-                            showlegend=True
-                        )
-                        
-                        st.plotly_chart(fig, use_container_width=True)
-                    else:
-                        st.info("No sleep stage data available for visualization")
-            
-            with col2:
-                st.subheader("Sleep Quality Metrics")
-                if len(sleep_df) > 0:
-                    recent_sleep = sleep_df.iloc[-1]
-                    
-                    # Safe metric calculation with 8-hour defaults
-                    sleep_score = recent_sleep.get('score', 'N/A')
-                    efficiency = recent_sleep.get('efficiency', 100) or 100
-                    latency = recent_sleep.get('latency', 0) or 0
-                    awake = recent_sleep.get('awake', 0) or 0
-                    total_duration = recent_sleep.get('total_duration', 28800) or 28800
-                    deep_sleep = recent_sleep.get('deep', 28800) or 28800
-                    rem_sleep = recent_sleep.get('rem', 28800) or 28800
-                    light_sleep = recent_sleep.get('light', 28800) or 28800
-                    avg_hr = recent_sleep.get('average_heart_rate', 60) or 60
-                    avg_hrv = recent_sleep.get('average_hrv', 30) or 30
-                    rest_hr = recent_sleep.get('resting_heart_rate', 60) or 60
-                    avg_breath = recent_sleep.get('average_breath', 15) or 15
-                    
-                    metrics = {
-                        "Sleep Score": sleep_score,
-                        "Total Duration": f"{total_duration / 3600:.1f} hours",
-                        "Efficiency": f"{efficiency:.1f}%",
-                        "Deep Sleep": f"{deep_sleep / 3600:.1f} hours",
-                        "REM Sleep": f"{rem_sleep / 3600:.1f} hours",
-                        "Light Sleep": f"{light_sleep / 3600:.1f} hours",
-                        "Latency": f"{latency / 60:.1f} min" if latency > 0 else "0 min",
-                        "Awake Time": f"{awake / 60:.1f} min" if awake > 0 else "0 min",
-                        "Avg Heart Rate": f"{avg_hr:.0f} bpm",
-                        "Avg HRV": f"{avg_hrv:.0f} ms",
-                        "Resting HR": f"{rest_hr:.0f} bpm",
-                        "Avg Breath Rate": f"{avg_breath:.0f} bpm"
-                    }
-                    
-                    for metric, value in metrics.items():
-                        st.metric(metric, value)
-        else:
-            st.info("Please sync your data to view detailed analytics.")
-    
-    with tab3:
-        st.header("Health Trends")
-        
-        if readiness_data is not None and len(readiness_data) > 0:
-            # HRV Trend
-            st.subheader("HRV Trends")
-            hrv_chart = create_hrv_chart(readiness_data)
-            if hrv_chart:
-                st.plotly_chart(hrv_chart, use_container_width=True)
-        else:
-            st.info("Please sync your data to view health trends.")
     
 
 
