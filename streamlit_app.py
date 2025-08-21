@@ -194,7 +194,7 @@ st.markdown("""
     
     /* Enhanced chart containers */
     .chart-container {
-        background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%);
+        background: linear-gradient(135deg, #8b9af8 0%, #a78bfa 100%);
         padding: 1.5rem;
         border-radius: 1rem;
         border: 1px solid #e2e8f0;
@@ -233,7 +233,7 @@ st.markdown("""
     
     /* Chart containers */
     .chart-container {
-        background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%);
+        background: linear-gradient(135deg, #8b9af8 0%, #a78bfa 100%);
         padding: 1.5rem;
         border-radius: 1rem;
         border: 1px solid #e2e8f0;
@@ -258,7 +258,7 @@ st.markdown("""
     
     /* Feature highlights with white text */
     .feature-highlight {
-        background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%);
+        background: linear-gradient(135deg, #8b9af8 0%, #a78bfa 100%);
         border: 1px solid #0ea5e9;
         border-radius: 1rem;
         padding: 1.5rem;
@@ -273,6 +273,15 @@ st.markdown("""
     
     .feature-highlight p {
         color: #ffffff;
+    }
+    
+    /* Custom analysis subheader styling */
+    .custom-analysis-subheader {
+        background: linear-gradient(135deg, #8b9af8 0%, #a78bfa 100%);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        display: inline-block;
+        margin-bottom: 1rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -523,13 +532,10 @@ def create_calories_burned_chart(activity_data):
 
 def display_metrics(sleep_data, readiness_data, activity_data):
     """Display key metrics in an attractive grid"""
-    if not sleep_data or not readiness_data or not activity_data:
-        return
-    
     # Calculate recent metrics
-    recent_sleep = sleep_data[-1] if len(sleep_data) > 0 else None
-    recent_readiness = readiness_data[-1] if len(readiness_data) > 0 else None
-    recent_activity = activity_data[-1] if len(activity_data) > 0 else None
+    recent_sleep = sleep_data[-1] if sleep_data and len(sleep_data) > 0 else None
+    recent_readiness = readiness_data[-1] if readiness_data and len(readiness_data) > 0 else None
+    recent_activity = activity_data[-1] if activity_data and len(activity_data) > 0 else None
     
     # Create metrics grid
     col1, col2, col3, col4 = st.columns(4)
@@ -540,7 +546,7 @@ def display_metrics(sleep_data, readiness_data, activity_data):
             if sleep_score is not None:
                 st.markdown("""
                 <div class="metric-card">
-                    <h3>🌙 Sleep Score</h3>
+                    <h3>Sleep Score</h3>
                     <div class="metric-value">{}</div>
                     <div class="metric-change positive">+2.5% from yesterday</div>
                 </div>
@@ -548,42 +554,74 @@ def display_metrics(sleep_data, readiness_data, activity_data):
             else:
                 st.markdown("""
                 <div class="metric-card">
-                    <h3>🌙 Sleep Score</h3>
+                    <h3>Sleep Score</h3>
                     <div class="metric-value">N/A</div>
                     <div class="metric-change">Score not available</div>
                 </div>
                 """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div class="metric-card">
+                <h3>Sleep Score</h3>
+                <div class="metric-value">N/A</div>
+                <div class="metric-change">No data available</div>
+            </div>
+            """, unsafe_allow_html=True)
     
     with col2:
         if recent_sleep is not None:
             duration_hrs = getattr(recent_sleep, 'total_sleep_duration', 0) / 3600
             st.markdown("""
             <div class="metric-card">
-                <h3>⏰ Sleep Duration</h3>
+                <h3>Sleep Duration</h3>
                 <div class="metric-value">{:.1f}h</div>
                 <div class="metric-change positive">+0.3h from yesterday</div>
             </div>
             """.format(duration_hrs), unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div class="metric-card">
+                <h3>Sleep Duration</h3>
+                <div class="metric-value">N/A</div>
+                <div class="metric-change">No data available</div>
+            </div>
+            """, unsafe_allow_html=True)
     
     with col3:
         if recent_readiness is not None:
             st.markdown("""
             <div class="metric-card">
-                <h3>💪 Readiness Score</h3>
+                <h3>Readiness Score</h3>
                 <div class="metric-value">{}</div>
                 <div class="metric-change positive">+5.2% from yesterday</div>
             </div>
             """.format(getattr(recent_readiness, 'score', 'N/A')), unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div class="metric-card">
+                <h3>Readiness Score</h3>
+                <div class="metric-value">N/A</div>
+                <div class="metric-change">No data available</div>
+            </div>
+            """, unsafe_allow_html=True)
     
     with col4:
         if recent_activity is not None:
             st.markdown("""
             <div class="metric-card">
-                <h3>🔥 Daily Burn</h3>
+                <h3>Daily Burn</h3>
                 <div class="metric-value">{}</div>
                 <div class="metric-change negative">-12 cal from yesterday</div>
             </div>
             """.format(getattr(recent_activity, 'active_calories', 'N/A')), unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div class="metric-card">
+                <h3>Daily Burn</h3>
+                <div class="metric-value">N/A</div>
+                <div class="metric-change">No data available</div>
+            </div>
+            """, unsafe_allow_html=True)
 
 def main():
     """Main application function"""
@@ -749,7 +787,7 @@ def main():
                     st.error(f"Custom analysis failed: {e}")
         
         # Custom AI Analysis
-        st.subheader("Custom Analysis")
+        st.markdown('<div class="custom-analysis-subheader"><h4>Custom Analysis</h4></div>', unsafe_allow_html=True)
         custom_question = st.text_area(
             "Ask a specific question about your health data:",
             placeholder="e.g., How does my sleep quality correlate with my readiness scores?",
