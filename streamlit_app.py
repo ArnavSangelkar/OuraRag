@@ -88,7 +88,7 @@ st.markdown("""
     
     /* Card styling */
     .metric-card {
-        background: linear-gradient(135deg, #8b9af8 0%, #a78bfa 100%);
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
         padding: 1.5rem;
         border-radius: 1rem;
         border: 1px solid #e2e8f0;
@@ -195,7 +195,7 @@ st.markdown("""
     
     /* Enhanced chart containers */
     .chart-container {
-        background: linear-gradient(135deg, #8b9af8 0%, #a78bfa 100%);
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
         padding: 1.5rem;
         border-radius: 1rem;
         border: 1px solid #e2e8f0;
@@ -234,7 +234,7 @@ st.markdown("""
     
     /* Chart containers */
     .chart-container {
-        background: linear-gradient(135deg, #8b9af8 0%, #a78bfa 100%);
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
         padding: 1.5rem;
         border-radius: 1rem;
         border: 1px solid #e2e8f0;
@@ -259,7 +259,7 @@ st.markdown("""
     
     /* Feature highlights with white text */
     .feature-highlight {
-        background: linear-gradient(135deg, #8b9af8 0%, #a78bfa 100%);
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
         border: 1px solid #0ea5e9;
         border-radius: 1rem;
         padding: 1.5rem;
@@ -831,9 +831,7 @@ def main():
         
         if sleep_data is not None and len(sleep_data) > 0:
             # Enhanced metrics display with better spacing
-            st.markdown('<div class="chart-container">', unsafe_allow_html=True)
             display_metrics(sleep_data, readiness_data, activity_data)
-            st.markdown('</div>', unsafe_allow_html=True)
             
             # Create three main score charts
             st.subheader("Health Score Trends")
