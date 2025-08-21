@@ -793,38 +793,38 @@ def main():
     with tab2:
         st.header("Health Dashboard")
         
-        # Clean feature highlights without emojis
-        col1, col2, col3 = st.columns(3)
+        # # Clean feature highlights without emojis
+        # col1, col2, col3 = st.columns(3)
         
-        with col1:
-            st.markdown("""
-            <div class="feature-highlight">
-                <h4>Sleep Analytics</h4>
-                <p>• Deep sleep tracking<br>
-                • REM cycle analysis<br>
-                • Sleep efficiency metrics</p>
-            </div>
-            """, unsafe_allow_html=True)
+        # with col1:
+        #     st.markdown("""
+        #     <div class="feature-highlight">
+        #         <h4>Sleep Analytics</h4>
+        #         <p>• Deep sleep tracking<br>
+        #         • REM cycle analysis<br>
+        #         • Sleep efficiency metrics</p>
+        #     </div>
+        #     """, unsafe_allow_html=True)
         
-        with col2:
-            st.markdown("""
-            <div class="feature-highlight">
-                <h4>Readiness Score</h4>
-                <p>• Daily readiness tracking<br>
-                • Recovery insights<br>
-                • Training recommendations</p>
-            </div>
-            """, unsafe_allow_html=True)
+        # with col2:
+        #     st.markdown("""
+        #     <div class="feature-highlight">
+        #         <h4>Readiness Score</h4>
+        #         <p>• Daily readiness tracking<br>
+        #         • Recovery insights<br>
+        #         • Training recommendations</p>
+        #     </div>
+        #     """, unsafe_allow_html=True)
         
-        with col3:
-            st.markdown("""
-            <div class="feature-highlight">
-                <h4>Calories Burned</h4>
-                <p>• Daily calorie tracking<br>
-                • Active calorie monitoring<br>
-                • Burn rate analysis</p>
-            </div>
-            """, unsafe_allow_html=True)
+        # with col3:
+        #     st.markdown("""
+        #     <div class="feature-highlight">
+        #         <h4>Calories Burned</h4>
+        #         <p>• Daily calorie tracking<br>
+        #         • Active calorie monitoring<br>
+        #         • Burn rate analysis</p>
+        #     </div>
+        #     """, unsafe_allow_html=True)
         
         # Fetch and display recent data
         sleep_data, readiness_data, activity_data = fetch_recent_data(7)
@@ -837,28 +837,22 @@ def main():
             st.subheader("Health Score Trends")
             
             # Sleep Score Chart
-            st.markdown('<div class="chart-container">', unsafe_allow_html=True)
             st.subheader("Sleep Score")
             sleep_chart = create_sleep_score_chart(sleep_data)
             if sleep_chart:
                 st.plotly_chart(sleep_chart, use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
             
             # Readiness Score Chart
-            st.markdown('<div class="chart-container">', unsafe_allow_html=True)
             st.subheader("Readiness Score")
             readiness_chart = create_readiness_score_chart(readiness_data)
             if readiness_chart:
                 st.plotly_chart(readiness_chart, use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
             
             # Calories Burned Chart
-            st.markdown('<div class="chart-container">', unsafe_allow_html=True)
             st.subheader("Calories Burned")
             activity_chart = create_calories_burned_chart(activity_data)
             if activity_chart:
                 st.plotly_chart(activity_chart, use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
         else:
             # Clean empty state without emojis
             st.markdown("""
