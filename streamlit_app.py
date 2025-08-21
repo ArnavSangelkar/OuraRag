@@ -88,7 +88,7 @@ st.markdown("""
     
     /* Card styling */
     .metric-card {
-        background: var(--card-background);
+        background: linear-gradient(135deg, #8b9af8 0%, #a78bfa 100%);
         padding: 1.5rem;
         border-radius: 1rem;
         border: 1px solid #e2e8f0;
@@ -103,7 +103,7 @@ st.markdown("""
     }
     
     .metric-card h3 {
-        color: var(--primary-color);
+        color: #ffffff;
         font-weight: 600;
         margin-bottom: 0.5rem;
         font-size: 1.1rem;
@@ -112,13 +112,14 @@ st.markdown("""
     .metric-value {
         font-size: 2rem;
         font-weight: 700;
-        color: var(--text-primary);
+        color: #ffffff;
         margin-bottom: 0.5rem;
     }
     
     .metric-change {
         font-size: 0.9rem;
         font-weight: 500;
+        color: #ffffff;
     }
     
     .metric-change.positive {
@@ -273,15 +274,6 @@ st.markdown("""
     
     .feature-highlight p {
         color: #ffffff;
-    }
-    
-    /* Custom analysis subheader styling */
-    .custom-analysis-subheader {
-        background: linear-gradient(135deg, #8b9af8 0%, #a78bfa 100%);
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        display: inline-block;
-        margin-bottom: 1rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -787,7 +779,7 @@ def main():
                     st.error(f"Custom analysis failed: {e}")
         
         # Custom AI Analysis
-        st.markdown('<div class="custom-analysis-subheader"><h4>Custom Analysis</h4></div>', unsafe_allow_html=True)
+        st.subheader("Custom Analysis")
         custom_question = st.text_area(
             "Ask a specific question about your health data:",
             placeholder="e.g., How does my sleep quality correlate with my readiness scores?",
