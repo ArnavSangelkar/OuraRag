@@ -194,7 +194,7 @@ st.markdown("""
     
     /* Enhanced chart containers */
     .chart-container {
-        background: var(--card-background);
+        background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%);
         padding: 1.5rem;
         border-radius: 1rem;
         border: 1px solid #e2e8f0;
@@ -233,7 +233,7 @@ st.markdown("""
     
     /* Chart containers */
     .chart-container {
-        background: var(--card-background);
+        background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%);
         padding: 1.5rem;
         border-radius: 1rem;
         border: 1px solid #e2e8f0;
@@ -258,7 +258,7 @@ st.markdown("""
     
     /* Feature highlights with white text */
     .feature-highlight {
-        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%);
         border: 1px solid #0ea5e9;
         border-radius: 1rem;
         padding: 1.5rem;
@@ -494,23 +494,23 @@ def create_readiness_score_chart(readiness_data):
     
     return fig
 
-def create_activity_score_chart(activity_data):
-    """Create a chart for activity score trends."""
+def create_calories_burned_chart(activity_data):
+    """Create a chart for calories burned trends."""
     if not activity_data or len(activity_data) == 0:
         return None
     
     df = pd.DataFrame([{
         'day': item.day,
-        'score': getattr(item, 'score', None)
+        'calories': getattr(item, 'active_calories', 0) or 0
     } for item in activity_data])
     
     df['date'] = pd.to_datetime(df['day'])
     df = df.sort_values('date')
     
     fig = px.line(
-        df, x='date', y='score',
-        title="Activity Score Over Time",
-        labels={'score': 'Activity Score', 'date': 'Date'}
+        df, x='date', y='calories',
+        title="Calories Burned Over Time",
+        labels={'calories': 'Calories Burned', 'date': 'Date'}
     )
     
     fig.update_layout(
@@ -797,10 +797,10 @@ def main():
         with col3:
             st.markdown("""
             <div class="feature-highlight">
-                <h4>Activity Metrics</h4>
-                <p>• Step counting<br>
-                • Calorie tracking<br>
-                • MET analysis</p>
+                <h4>Calories Burned</h4>
+                <p>• Daily calorie tracking<br>
+                • Active calorie monitoring<br>
+                • Burn rate analysis</p>
             </div>
             """, unsafe_allow_html=True)
         
@@ -832,10 +832,10 @@ def main():
                 st.plotly_chart(readiness_chart, use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
             
-            # Activity Score Chart
+            # Calories Burned Chart
             st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-            st.subheader("Activity Score")
-            activity_chart = create_activity_score_chart(activity_data)
+            st.subheader("Calories Burned")
+            activity_chart = create_calories_burned_chart(activity_data)
             if activity_chart:
                 st.plotly_chart(activity_chart, use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
