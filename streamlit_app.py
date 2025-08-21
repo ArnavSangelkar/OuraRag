@@ -456,7 +456,6 @@ def create_sleep_score_chart(sleep_data):
     
     fig = px.line(
         df, x='date', y='score',
-        title="Sleep Score Over Time",
         labels={'score': 'Sleep Score', 'date': 'Date'}
     )
     
@@ -483,7 +482,6 @@ def create_readiness_score_chart(readiness_data):
     
     fig = px.line(
         df, x='date', y='score',
-        title="Readiness Score Over Time",
         labels={'score': 'Readiness Score', 'date': 'Date'}
     )
     
@@ -510,7 +508,6 @@ def create_calories_burned_chart(activity_data):
     
     fig = px.line(
         df, x='date', y='calories',
-        title="Calories Burned Over Time",
         labels={'calories': 'Calories Burned', 'date': 'Date'}
     )
     
@@ -663,51 +660,6 @@ def main():
                     st.success(f"Cleared and synced {days_to_sync} days!")
                 except Exception as e:
                     st.error(f"Clear & sync failed: {e}")
-        
-        st.markdown("---")
-        
-        # AI Assistant Section
-        st.subheader("AI Assistant")
-        question = st.text_input("Ask about your health:", placeholder="How did my sleep quality change last week?")
-        
-        if st.button("Ask AI", type="primary", use_container_width=True) and question:
-            try:
-                response = ask_ai(question)
-                st.markdown("""
-                <div style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 0.5rem; padding: 1rem;">
-                    <h4 style="color: #0369a1; margin-bottom: 0.5rem;">AI Response:</h4>
-                    <p style="color: #0c4a6e;">{}</p>
-                </div>
-                """.format(response), unsafe_allow_html=True)
-            except Exception as e:
-                st.error(f"AI analysis failed: {e}")
-        
-        st.markdown("---")
-        
-        # Quick Stats
-        st.subheader("Quick Stats")
-        try:
-            sleep_data, readiness_data, activity_data = fetch_recent_data(1)
-            if sleep_data and len(sleep_data) > 0:
-                recent_sleep = sleep_data[-1]
-                st.metric("Last Sleep Score", f"{getattr(recent_sleep, 'score', 'N/A')}")
-                st.metric("Sleep Duration", f"{getattr(recent_sleep, 'total_sleep_duration', 0) / 3600:.1f}h")
-        except:
-            st.info("No recent data")
-        
-        st.markdown("---")
-        
-        # API Status moved to bottom
-        st.subheader("API Status")
-        if check_api_keys():
-            st.markdown("""
-            <div style="background: #d1fae5; color: #065f46; padding: 0.5rem; border-radius: 0.5rem; text-align: center;">
-                All APIs Connected
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            st.error("API Keys Missing")
-            st.stop()
     
     # Main content area with AI Insights and Dashboard only
     tab1, tab2 = st.tabs(["AI Insights", "Dashboard"])
