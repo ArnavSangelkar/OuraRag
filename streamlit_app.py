@@ -537,7 +537,6 @@ def display_metrics(sleep_data, readiness_data, activity_data):
                 <div class="metric-card">
                     <h3>Sleep Score</h3>
                     <div class="metric-value">{}</div>
-                    <div class="metric-change positive">+2.5% from yesterday</div>
                 </div>
                 """.format(sleep_score), unsafe_allow_html=True)
             else:
@@ -564,7 +563,6 @@ def display_metrics(sleep_data, readiness_data, activity_data):
             <div class="metric-card">
                 <h3>Sleep Duration</h3>
                 <div class="metric-value">{:.1f}h</div>
-                <div class="metric-change positive">+0.3h from yesterday</div>
             </div>
             """.format(duration_hrs), unsafe_allow_html=True)
         else:
@@ -582,7 +580,6 @@ def display_metrics(sleep_data, readiness_data, activity_data):
             <div class="metric-card">
                 <h3>Readiness Score</h3>
                 <div class="metric-value">{}</div>
-                <div class="metric-change positive">+5.2% from yesterday</div>
             </div>
             """.format(getattr(recent_readiness, 'score', 'N/A')), unsafe_allow_html=True)
         else:
@@ -598,15 +595,14 @@ def display_metrics(sleep_data, readiness_data, activity_data):
         if recent_activity is not None:
             st.markdown("""
             <div class="metric-card">
-                <h3>Daily Burn</h3>
+                <h3>Daily Active Calories Burned</h3>
                 <div class="metric-value">{}</div>
-                <div class="metric-change negative">-12 cal from yesterday</div>
             </div>
             """.format(getattr(recent_activity, 'active_calories', 'N/A')), unsafe_allow_html=True)
         else:
             st.markdown("""
             <div class="metric-card">
-                <h3>Daily Burn</h3>
+                <h3>Daily Active Calories Burned</h3>
                 <div class="metric-value">N/A</div>
                 <div class="metric-change">No data available</div>
             </div>
@@ -801,7 +797,7 @@ def main():
                 st.plotly_chart(readiness_chart, use_container_width=True)
             
             # Calories Burned Chart
-            st.subheader("Calories Burned")
+            st.subheader("Active Calories Burned")
             activity_chart = create_calories_burned_chart(activity_data)
             if activity_chart:
                 st.plotly_chart(activity_chart, use_container_width=True)
